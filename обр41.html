@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table to CSV</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+            min-height: 100vh;
+        }
+
+        /* СТАРТОВЫЙ ЭКРАН - компактный по центру */
+        .upload-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .upload-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .upload-card h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 12px 32px;
+            background: #0078D4;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background 0.2s;
+            border: none;
+        }
+
+        .upload-btn:hover {
+            background: #106EBE;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* РАБОЧИЙ ИНТЕРФЕЙС - компактный стиль Excel */
+        .container {
+            display: none;
+            padding: 16px;
+            max-width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .info-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+
+        .sheet-selector select {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #d1d1d1;
+            font-size: 13px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .table-container {
+		padding: 0;
+            overflow: auto;
+            margin-bottom: 12px;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            max-height: calc(100vh - 200px);
+            background: white;
+			font-size: 12px;
+        }
+
+        /* СТИЛЬ EXCEL для таблицы */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        th, td {
+            padding: 6px 10px;
+            text-align: left;
+            border: 1px solid #d1d1d1;
+            min-width: 100px;
+            background: white;
+        }
+
+        th {
+            background: #f2f2f2;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+            transition: background 0.15s;
+            user-select: none;
+            color: #333;
+        }
+
+        th:hover {
+            background: #e5e5e5;
+        }
+
+        th.selected {
+            background: #0078D4;
+            color: white;
+        }
+
+        td {
+            cursor: pointer;
+            transition: background 0.1s;
+            color: #333;
+        }
+
+        td:hover {
+            background: #f9f9f9;
+        }
+
+        .row-hidden {
+            display: none;
+        }
+
+        .rename-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .rename-input {
+            width: 100%;
+            padding: 4px 4px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .rename-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: white;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            min-width: 180px;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.1s;
+            color: #333;
+        }
+
+        .dropdown-item:hover {
+            background: #f0f0f0;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #107C10;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0e6b0e;
+        }
+
+        .btn-secondary {
+            background: #f3f3f3;
+            color: #333;
+            border: 1px solid #d1d1d1;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e5e5;
+        }
+
+        .btn-load-more {
+            background: #0078D4;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-load-more:hover {
+            background: #106EBE;
+        }
+
+        button:disabled {
+            background: #f3f3f3;
+            color: #a6a6a6;
+            cursor: not-allowed;
+            border: 1px solid #d1d1d1;
+        }
+
+        .stats {
+            display: inline-flex;
+            gap: 16px;
+            padding: 6px 12px;
+            background: white;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #d1d1d1;
+        }
+
+        .stat-item {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .stat-item span:first-child {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #0078D4;
+        }
+
+        .load-more-container {
+            text-align: center;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            margin-top: 12px;
+            border: 1px solid #d1d1d1;
+        }
+		#dataTable {
+    font-size: 12px;          /* меньший шрифт */
+    border-collapse: collapse; /* убирает двойные границы */
+}
+
+#dataTable th,
+#dataTable td {
+    padding: 2px 4px;         /* меньше отступы внутри ячеек */
+    line-height: 1.1;         /* меньше высота строки */
+}
+
+#dataTable th {
+    font-weight: 500;
+}
+#dataTable tr {
+    height: 18px;             /* фиксированная низкая строка */
+}
+
+#dataTable thead th {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            background: #fff4ce;
+            border-radius: 4px;
+            border-left: 3px solid #ffb900;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <!-- СТАРТОВЫЙ ЭКРАН -->
+    <div class="upload-screen" id="uploadScreen">
+        <div class="upload-card">
+            <h1>📊 Table to CSV</h1>
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.xmls,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn">
+            <label for="fileInput" class="upload-btn">Загрузить файл</label>
+        </div>
+    </div>
+
+    <!-- РАБОЧИЙ ИНТЕРФЕЙС -->
+    <div class="container" id="tableContainer">
+        <div class="header">
+            <h1>📊 Table to CSV</h1>
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.xmls,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn">
+                <label for="fileInput2" class="upload-btn" style="padding: 6px 16px; font-size: 13px;">Загрузить другой файл</label>
+            </div>
+        </div>
+
+        <div class="hint">
+            <strong>Инструкция:</strong> Выберите колонки, кликнув по заголовкам → Выберите или введите название → Кликните по строке, чтобы скрыть все строки выше
+        </div>
+
+        <div class="info-bar">
+            <div class="sheet-selector" id="sheetSelector" style="display: none;">
+                <select id="sheetSelect"></select>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span>Колонок:</span>
+                    <span class="stat-value" id="totalColumns">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Выбрано:</span>
+                    <span class="stat-value" id="selectedColumns">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Строк:</span>
+                    <span class="stat-value" id="totalRows">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-primary" id="downloadBtn" disabled>⬇️ Скачать CSV</button>
+            <button class="btn-secondary" id="resetBtn">🔄 Сбросить</button>
+        </div>
+
+        <div class="table-container">
+            <table id="dataTable"></table>
+        </div>
+
+        <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+            <button class="btn-load-more" id="loadMoreBtn">Показать все строки (<span id="remainingRows">0</span>)</button>
+        </div>
+    </div>
+
+    <script>
+        const COLUMN_TEMPLATES = [
+            'Наименование',
+            'Штрихкод',
+            'Цена',
+            'Цена нал',
+            'Цена БН',
+            'Цена от 300т.р.',
+            'Цена от 750т.р.',
+            'Цена от 300т.р. НДС',
+            'Цена от 750т.р. НДС'
+        ];
+
+        let tableData = [];
+        let selectedColumns = new Map();
+        let startRowIndex = 0;
+        let currentWorkbook = null;
+        let displayedRows = 50;
+        let activeDropdown = null;
+        let originalFileName = 'export';
+
+        const uploadScreen = document.getElementById('uploadScreen');
+        const fileInput = document.getElementById('fileInput');
+        const fileInput2 = document.getElementById('fileInput2');
+        const tableContainer = document.getElementById('tableContainer');
+        const dataTable = document.getElementById('dataTable');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const sheetSelector = document.getElementById('sheetSelector');
+        const sheetSelect = document.getElementById('sheetSelect');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const loadMoreContainer = document.getElementById('loadMoreContainer');
+
+        fileInput.addEventListener('change', handleFileUpload);
+        fileInput2.addEventListener('change', handleFileUpload);
+        downloadBtn.addEventListener('click', downloadCSV);
+        resetBtn.addEventListener('click', resetSelection);
+        sheetSelect.addEventListener('change', handleSheetChange);
+        loadMoreBtn.addEventListener('click', loadAllRows);
+
+        document.addEventListener('click', (e) => {
+            if (activeDropdown && !e.target.closest('.rename-wrapper')) {
+                activeDropdown.classList.remove('show');
+                activeDropdown = null;
+            }
+        });
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            originalFileName = file.name.replace(/\.[^/.]+$/, '');
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                try {
+                    currentWorkbook = XLSX.read(data, { type: 'array' });
+
+                    if (currentWorkbook.SheetNames.length > 1) {
+                        sheetSelect.innerHTML = '';
+                        currentWorkbook.SheetNames.forEach((name, index) => {
+                            const option = document.createElement('option');
+                            option.value = index;
+                            option.textContent = name;
+                            sheetSelect.appendChild(option);
+                        });
+                        sheetSelector.style.display = 'block';
+                    } else {
+                        sheetSelector.style.display = 'none';
+                    }
+
+                    loadSheet(0);
+                    
+                    // Переключаемся на рабочий интерфейс
+                    uploadScreen.style.display = 'none';
+                    tableContainer.style.display = 'block';
+                } catch (error) {
+                    alert('Ошибка при чтении файла: ' + error.message);
+                    console.error(error);
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handleSheetChange() {
+            const sheetIndex = parseInt(sheetSelect.value);
+            loadSheet(sheetIndex);
+        }
+
+        function loadSheet(sheetIndex) {
+            if (!currentWorkbook) return;
+
+            const sheetName = currentWorkbook.SheetNames[sheetIndex];
+            const worksheet = currentWorkbook.Sheets[sheetName];
+
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
+    header: 1,
+    defval: '',
+    raw: true      // было false
+});
+
+            tableData = jsonData;
+            startRowIndex = 0;
+            selectedColumns.clear();
+            displayedRows = Math.min(50, tableData.length);
+            renderTable();
+            updateLoadMoreButton();
+        }
+
+        function loadAllRows() {
+            displayedRows = tableData.length;
+            renderTable();
+            updateLoadMoreButton();
+        }
+
+        function updateLoadMoreButton() {
+            const remaining = tableData.length - displayedRows;
+            if (remaining > 0) {
+                loadMoreContainer.style.display = 'block';
+                document.getElementById('remainingRows').textContent = remaining;
+            } else {
+                loadMoreContainer.style.display = 'none';
+            }
+        }
+
+        function renderTable() {
+            if (tableData.length === 0) {
+                dataTable.innerHTML = '<tr><td>Нет данных</td></tr>';
+                return;
+            }
+
+            const maxCols = Math.max(...tableData.map(row => row.length));
+            const rowsToShow = Math.min(displayedRows, tableData.length);
+
+            let html = '<thead><tr>';
+            for (let i = 0; i < maxCols; i++) {
+                const isSelected = selectedColumns.has(i);
+                const customName = selectedColumns.get(i) || '';
+                html += `<th class="${isSelected ? 'selected' : ''}" data-col="${i}">
+                    ${isSelected ? createRenameInput(i, customName) : `Колонка ${i + 1}`}
+                </th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            for (let rowIndex = 0; rowIndex < rowsToShow; rowIndex++) {
+                const row = tableData[rowIndex];
+                const isHidden = rowIndex < startRowIndex;
+                html += `<tr class="${isHidden ? 'row-hidden' : ''}" data-row-index="${rowIndex}">`;
+                for (let i = 0; i < maxCols; i++) {
+                    const cellValue = row[i] !== undefined && row[i] !== null ? row[i] : '';
+                    const escaped = String(cellValue).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    html += `<td data-row="${rowIndex}" data-col="${i}">${escaped}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '</tbody>';
+            dataTable.innerHTML = html;
+
+            attachEventListeners();
+            updateStats();
+        }
+
+        function createRenameInput(colIndex, value) {
+            const escapedValue = String(value).replace(/"/g, '&quot;');
+            return `
+                <div class="rename-wrapper" data-col="${colIndex}">
+                    <input type="text" class="rename-input" value="${escapedValue}" data-col="${colIndex}" placeholder="Введите или выберите...">
+                    <div class="dropdown" data-col="${colIndex}">
+                        ${COLUMN_TEMPLATES.map(template => {
+                            const escapedTemplate = String(template).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            return `<div class="dropdown-item" data-value="${escapedTemplate}">${escapedTemplate}</div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function attachEventListeners() {
+            document.querySelectorAll('th').forEach(th => {
+                th.addEventListener('click', (e) => {
+                    if (e.target.closest('.rename-wrapper')) return;
+
+                    const colIndex = parseInt(th.dataset.col);
+
+                    if (selectedColumns.has(colIndex)) {
+                        selectedColumns.delete(colIndex);
+                    } else {
+                        selectedColumns.set(colIndex, COLUMN_TEMPLATES[0]);
+                    }
+
+                    renderTable();
+                });
+            });
+
+            document.querySelectorAll('.rename-input').forEach(input => {
+                // Сразу открываем список при клике на инпут
+                input.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const colIndex = parseInt(e.target.dataset.col);
+                    const dropdown = document.querySelector(`.dropdown[data-col="${colIndex}"]`);
+
+                    if (activeDropdown && activeDropdown !== dropdown) {
+                        activeDropdown.classList.remove('show');
+                    }
+
+                    dropdown.classList.add('show');
+                    activeDropdown = dropdown;
+                });
+
+                // Возможность вручную вводить название
+                input.addEventListener('input', (e) => {
+                    const colIndex = parseInt(e.target.dataset.col);
+                    selectedColumns.set(colIndex, e.target.value);
+                    updateStats();
+                });
+
+                input.addEventListener('focus', (e) => {
+                    e.target.select();
+                });
+            });
+
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const value = e.target.dataset.value;
+                    const dropdown = e.target.closest('.dropdown');
+                    const colIndex = parseInt(dropdown.dataset.col);
+                    const input = document.querySelector(`.rename-input[data-col="${colIndex}"]`);
+
+                    input.value = value;
+                    selectedColumns.set(colIndex, value);
+                    dropdown.classList.remove('show');
+                    activeDropdown = null;
+                    updateStats();
+                });
+            });
+
+            // При клике по строке - скрываем все строки выше
+            document.querySelectorAll('td').forEach(td => {
+                td.addEventListener('click', (e) => {
+                    const rowIndex = parseInt(td.dataset.row);
+                    startRowIndex = rowIndex;
+                    renderTable();
+                });
+            });
+        }
+
+        function updateStats() {
+            const maxCols = tableData.length > 0 ? Math.max(...tableData.map(row => row.length)) : 0;
+            document.getElementById('totalColumns').textContent = maxCols;
+            document.getElementById('selectedColumns').textContent = selectedColumns.size;
+            document.getElementById('totalRows').textContent = Math.max(0, tableData.length - startRowIndex);
+
+            downloadBtn.disabled = selectedColumns.size === 0;
+        }
+
+function downloadCSV() {
+    if (selectedColumns.size === 0) {
+        alert('Выберите хотя бы одну колонку');
+        return;
+    }
+
+    const selectedIndices = Array.from(selectedColumns.keys()).sort((a, b) => a - b);
+    let csvContent = '';
+
+    // Заголовки
+    csvContent += selectedIndices.map(i => escapeCSV(selectedColumns.get(i))).join(',') + '\n';
+
+    // Ищем колонку "Штрихкод" по пользовательскому названию
+    let barcodeColIndex = -1;
+    for (const [colIndex, userName] of selectedColumns.entries()) {
+        const normalized = String(userName).toLowerCase().trim();
+        if (normalized === 'штрихкод' || normalized === 'barcode') {
+            barcodeColIndex = colIndex;
+            break;
+        }
+    }
+
+    if (barcodeColIndex === -1) {
+        alert('Не найдена колонка с названием "Штрихкод". Переименуйте нужный столбец.');
+        return;
+    }
+
+    let skippedRows = 0;
+
+    for (let rowIndex = startRowIndex; rowIndex < tableData.length; rowIndex++) {
+        const row = tableData[rowIndex];
+
+        // Собираем значения для всех выбранных колонок
+        const values = selectedIndices.map(colIndex => {
+            let value = row[colIndex] !== undefined && row[colIndex] !== null ? row[colIndex] : '';
+            value = String(value).trim();
+
+            // Нормализация формата 1349,00 -> 1349.00
+            if (/^\d+,\d{2}$/.test(value)) {
+                value = value.replace(',', '.');
+            }
+
+            return value;
+        });
+
+        // Пропускаем полностью пустые строки
+        const allEmpty = values.every(v => v === '');
+        if (allEmpty) {
+            continue;
+        }
+
+        // Проверяем штрихкод
+const barcodeValue = String(row[barcodeColIndex] ?? '').trim();
+
+// если пусто ИЛИ не только цифры — пропускаем строку
+if (!/^\d+$/.test(barcodeValue)) {
+    skippedRows++;
+    continue;
+}
+
+
+        // Формируем CSV-строку
+        const csvRow = values.map(v => escapeCSV(v)).join(',');
+        csvContent += csvRow + '\n';
+    }
+
+    if (skippedRows > 0) {
+        alert(`Пропущено строк с некорректным штрихкодом: ${skippedRows}`);
+    }
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', originalFileName + '.csv');
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+}
+
+
+
+        function escapeCSV(value) {
+            if (value === null || value === undefined) return '';
+
+            const stringValue = String(value);
+
+            if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('\r') || stringValue.includes('"')) {
+                return '"' + stringValue.replace(/"/g, '""') + '"';
+            }
+
+            return stringValue;
+        }
+
+        function resetSelection() {
+            selectedColumns.clear();
+            startRowIndex = 0;
+            renderTable();
+        }
+    </script>
+</body>
+</html>
