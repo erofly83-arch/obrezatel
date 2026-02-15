@@ -1,16 +1,23 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<html lang="ru"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Table to CSV</title>
-    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <!-- Конфиг, который вшивается в "Сохранить" -->
-  <script id="userConfig" type="application/json">{}</script>
+  <script id="userConfig" type="application/json">{
+  "columnTemplates": [
+    "Наименование",
+    "Цена",
+    "Штрихкод",
+    "Цена НДС",
+    "Цена НАЛ",
+    "Остаток"
+  ]
+}</script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -307,24 +314,24 @@
 
 <body>
   <!-- Upload -->
-  <div class="upload-screen" id="uploadScreen">
+  <div class="upload-screen" id="uploadScreen" style="display: flex;">
     <div class="upload-card">
       <h1>📊 Table to CSV</h1>
-      <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn"/>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn">
       <label for="fileInput" class="upload-btn">Загрузить файл</label>
     </div>
   </div>
 
   <!-- Main -->
-  <div class="container" id="tableContainer">
+  <div class="container" id="tableContainer" style="display: none;">
     <div class="header">
       <h1>📊 Table to CSV</h1>
 
       <div class="file-input-wrapper">
-        <input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn"/>
+        <input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn">
         <label for="fileInput2" class="upload-btn" style="padding: 6px 14px; font-size: 13px;">Загрузить другой файл</label>
 
-        <div class="sheet-selector" id="sheetSelector">
+        <div class="sheet-selector" id="sheetSelector" style="display: none;">
           <select id="sheetSelect"></select>
         </div>
       </div>
@@ -343,7 +350,7 @@
     </div>
 
     <div class="actions">
-      <button class="btn-primary" id="downloadBtn" disabled>⬇️ Скачать CSV</button>
+      <button class="btn-primary" id="downloadBtn" disabled="">⬇️ Скачать CSV</button>
       <button class="btn-secondary" id="resetBtn">🔄 Сбросить</button>
       <button class="btn-secondary" id="manageTemplatesBtn">📝 Наименования</button>
       <button class="btn-secondary" id="saveAppBtn">💾 Сохранить</button>
@@ -353,13 +360,13 @@
       <table id="dataTable"></table>
     </div>
 
-    <div class="load-more-container" id="loadMoreContainer">
+    <div class="load-more-container" id="loadMoreContainer" style="display: none;">
       <button class="btn-load-more" id="loadMoreBtn">Показать все строки (<span id="remainingRows">0</span>)</button>
     </div>
   </div>
 
   <!-- Templates modal -->
-  <div class="modal" id="templatesModal">
+  <div class="modal" id="templatesModal" style="display: none;">
     <div class="modal-content">
       <div class="modal-header">
         <div>Наименования колонок</div>
@@ -367,10 +374,10 @@
       </div>
       <div class="modal-body">
         <div class="template-add">
-          <input id="newTemplateInput" type="text" placeholder="Добавить вариант (например: Штрихкод)"/>
+          <input id="newTemplateInput" type="text" placeholder="Добавить вариант (например: Штрихкод)">
           <button class="btn-primary" id="addTemplateBtn">Добавить</button>
         </div>
-        <div id="templatesList"></div>
+        <div id="templatesList"><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div></div>
         <div class="hint" style="margin-top: 10px;">
           Изменения попадут в выпадающий список и сохранятся в файл при нажатии «Сохранить».
         </div>
@@ -379,7 +386,7 @@
   </div>
 
   <!-- Skipped modal -->
-  <div class="modal" id="skippedModal">
+  <div class="modal" id="skippedModal" style="display: none;">
     <div class="modal-content">
       <div class="modal-header">
         <div>Пропущенные строки</div>
@@ -1109,5 +1116,6 @@
       await saveTextFile("table-to-csv-appsaved.html", html, "text/html;charset=utf-8");
     });
   </script>
-</body>
-</html>
+
+
+</body></html>
