@@ -10,13 +10,41 @@
   <!-- Конфиг, который вшивается в "Сохранить" -->
   <script id="userConfig" type="application/json">{
   "columnTemplates": [
-    "Наименование",
+    "Цена БН",
+    "Цена НАЛ",
     "Цена",
     "Штрихкод",
-    "Цена НДС",
-    "Цена НАЛ",
+    "Наименование",
     "Остаток"
-  ]
+  ],
+  "columnSynonyms": {
+    "Штрихкод": [
+      "штрихкод штука",
+      "штрих-код",
+      "штрихкод",
+      "штрихкод номенклатуры"
+    ],
+    "Наименование": [
+      "наименование товара",
+      "наименование товаров",
+      "номенклатура",
+      "наименование"
+    ],
+    "Остаток": [
+      "свободный",
+      "свободный остаток"
+    ],
+    "Цена": [
+      "входящая",
+      "входящая цена"
+    ],
+    "Цена БН": [
+      "Прайс БН"
+    ],
+    "Цена НАЛ": [
+      "Прайс 2"
+    ]
+  }
 }</script>
 
   <style>
@@ -368,6 +396,23 @@
   border-color: #007aff;
 }
 
+
+    .template-block { border:1px solid #e0e0e0; border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .template-row { display:flex; gap:6px; align-items:center; padding:6px 8px; background:#fafafa; margin:0; }
+    .template-row input { flex:1; padding:7px 10px; border-radius:8px; border:1px solid #d1d1d1; font-size:13px; margin:0; }
+    .btn-icon { padding:4px 9px !important; min-width:28px; font-size:14px; line-height:1; }
+    .btn-icon:disabled { opacity:.35; }
+    .synonyms-panel { padding:8px 12px 10px; background:#f5f7ff; border-top:1px solid #e0e4ff; }
+    .synonyms-label { font-size:11px; color:#777; margin-bottom:6px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; }
+    .synonyms-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; min-height:26px; }
+    .synonym-chip { display:inline-flex; align-items:center; background:#e8f0ff; border:1px solid #b8cfff; border-radius:6px; padding:2px 2px 2px 6px; gap:2px; }
+    .synonym-input { border:none; background:transparent; font-size:12px; padding:1px 3px; width:130px; outline:none; color:#223; }
+    .synonym-remove { background:none; border:none; cursor:pointer; font-size:15px; color:#999; padding:0 3px; line-height:1; font-weight:700; }
+    .synonym-remove:hover { color:#c00; background:none; }
+    .synonym-add-row { display:flex; gap:6px; align-items:center; margin-top:4px; }
+    .synonym-new-input { flex:1; padding:5px 8px; border-radius:6px; border:1px solid #c5d0ee; font-size:12px; background:#fff; }
+    .syn-toggle-btn { font-size:12px !important; padding:5px 10px !important; }
+    #templatesModal .modal-body { max-height:72vh; overflow-y:auto; }
   </style>
 </head>
 
@@ -406,7 +451,10 @@
   <!-- Main -->
   <div class="container" id="tableContainer" style="display: none;">
     <div class="header">
-      <h1>📊 Table to CSV</h1>
+      <div>
+        <h1>📊 Table to CSV</h1>
+        <div id="fileNameDisplay" style="font-size:12px;color:#555;margin-top:3px;">📂 Фиорд нал 17.02.xls</div>
+      </div>
 
       <div class="file-input-wrapper">
         <input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn">
@@ -419,7 +467,7 @@
     </div>
 
     <div class="hint">
-      <strong>Инструкция:</strong> Клик по заголовку выбирает колонку и открывает список → можно выбрать или ввести название вручную → клик по строке скрывает все строки выше.
+      <strong>Инструкция:</strong> После загрузки файла колонки определяются автоматически по ключевым словам в первых 15 строках. Клик по заголовку выбирает/снимает колонку → можно выбрать или ввести название вручную → клик по строке скрывает все строки выше.
     </div>
 
     <div class="info-bar">
@@ -458,7 +506,7 @@
           <input id="newTemplateInput" type="text" placeholder="Добавить вариант (например: Штрихкод)">
           <button class="btn-primary" id="addTemplateBtn">Добавить</button>
         </div>
-        <div id="templatesList"><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div><div class="template-row"><input type="text"><button class="btn-secondary">Удалить</button></div></div>
+        <div id="templatesList"><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх" disabled="">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы ▲</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: block;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз" disabled="">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div></div>
         <div class="hint" style="margin-top: 10px;">
           Изменения попадут в выпадающий список и сохранятся в файл при нажатии «Сохранить».
         </div>
@@ -474,10 +522,10 @@
         <button class="btn-secondary" id="closeSkippedModal">Закрыть</button>
       </div>
       <div class="modal-body">
-        <div id="skippedSummary" class="muted"></div>
+        <div id="skippedSummary" class="muted">Всего пропусков: 476. Скрыто пустых: 472. Показано: 4.</div>
 
         <div class="skipped-wrap">
-          <table class="skipped-table" id="skippedTable"></table>
+          <table class="skipped-table" id="skippedTable"><thead><tr><th style="min-width:90px;">Строка</th><th style="min-width:240px;">Штрихкод (как в файле)</th><th style="min-width:240px;">Нормализованный</th><th style="min-width:260px;">Причина</th></tr></thead><tbody><tr><td>2</td><td>Штрих-код</td><td></td><td>Некорректный штрихкод</td></tr><tr><td>2151</td><td>7CP-5GP-0100</td><td></td><td>Некорректный штрихкод</td></tr><tr><td>4668</td><td>2020-08</td><td></td><td>Некорректный штрихкод</td></tr><tr><td>4670</td><td>2021-08</td><td></td><td>Некорректный штрихкод</td></tr></tbody></table>
         </div>
 
         <div class="skipped-actions">
@@ -534,15 +582,31 @@
       return DEFAULT_COLUMN_TEMPLATES.slice();
     }
 
-    function persistColumnTemplates() {
+    const DEFAULT_COLUMN_SYNONYMS = {
+      "Штрихкод":     ["штрихкод штука", "штрих-код", "штрихкод", "barcode", "ean"],
+      "Наименование": ["наименование товара", "наименование товаров", "номенклатура", "наименование"],
+      "Остаток":      ["свободный"],
+      "Цена":         ["входящая"]
+    };
+    function loadColumnSynonyms() {
+      const cfg = getUserConfig();
+      if (cfg.columnSynonyms && typeof cfg.columnSynonyms === "object") return cfg.columnSynonyms;
+      const raw = localStorage.getItem("columnSynonyms");
+      if (raw) { try { const o = JSON.parse(raw); if (o && typeof o === "object") return o; } catch {} }
+      return JSON.parse(JSON.stringify(DEFAULT_COLUMN_SYNONYMS));
+    }
+    function persistAll() {
       const cfg = getUserConfig();
       cfg.columnTemplates = columnTemplates.slice();
+      cfg.columnSynonyms = columnSynonyms;
       setUserConfig(cfg);
       localStorage.setItem("columnTemplates", JSON.stringify(columnTemplates));
+      localStorage.setItem("columnSynonyms", JSON.stringify(columnSynonyms));
     }
-
+    function persistColumnTemplates() { persistAll(); }
     let columnTemplates = loadColumnTemplates();
-    persistColumnTemplates();
+    let columnSynonyms  = loadColumnSynonyms();
+    persistAll();
 
     // --- App state ---
     let tableData = null;
@@ -569,6 +633,7 @@
     const resetBtn = document.getElementById("resetBtn");
     const manageTemplatesBtn = document.getElementById("manageTemplatesBtn");
     const saveAppBtn = document.getElementById("saveAppBtn");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
 
     const sheetSelector = document.getElementById("sheetSelector");
     const sheetSelect = document.getElementById("sheetSelect");
@@ -608,6 +673,7 @@
       if (!file) return;
 
       originalFileName = (file.name || "export").replace(/\.[^.]+$/, "");
+      if (fileNameDisplay) fileNameDisplay.textContent = "📂 " + (file.name || "");
 
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -644,7 +710,38 @@
       loadSheet(idx);
     });
 
-    function loadSheet(sheetIndex) {
+    // --- Auto-detect column names from first 15 rows (exact match, case-insensitive) ---
+    function autoDetectColumns() {
+      if (!tableData || tableData.length === 0) return;
+      const SCAN_ROWS = 15;
+      const maxCols = Math.max(0, ...tableData.map(r => r ? r.length : 0));
+      for (let col = 0; col < maxCols; col++) {
+        if (selectedColumns.has(col)) continue;
+        for (let row = 0; row < Math.min(SCAN_ROWS, tableData.length); row++) {
+          const cell = (tableData[row] || [])[col];
+          if (cell === undefined || cell === null) continue;
+          const norm = String(cell).toLowerCase().replace(/\s+/g, " ").trim();
+          if (!norm) continue;
+          let matched = false;
+          for (const tplName of columnTemplates) {
+            const synonyms = (columnSynonyms[tplName] || []).filter(Boolean);
+            for (const syn of synonyms) {
+              const synNorm = syn.toLowerCase().replace(/\s+/g, " ").trim();
+              // Точное совпадение без учёта регистра
+              if (synNorm && norm === synNorm) {
+                selectedColumns.set(col, tplName);
+                matched = true;
+                break;
+              }
+            }
+            if (matched) break;
+          }
+          if (matched) break;
+        }
+      }
+    }
+
+        function loadSheet(sheetIndex) {
       if (!currentWorkbook) return;
       const sheetName = currentWorkbook.SheetNames[sheetIndex];
       const worksheet = currentWorkbook.Sheets[sheetName];
@@ -655,6 +752,7 @@
       selectedColumns.clear();
       displayedRows = Math.min(50, tableData.length);
 
+      autoDetectColumns();
       renderTable();
       updateLoadMoreButton();
     }
@@ -969,16 +1067,13 @@
     }
 
     // --- Saving helpers ---
-    function downloadTextFile(filename, text, mime) {
-      const blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+    function _pickerTypes(filename) {
+      const n = String(filename).toLowerCase();
+      if (n.endsWith(".html") || n.endsWith(".htm"))
+        return [{ description: "HTML-файл", accept: { "text/html": [".html"] } }];
+      if (n.endsWith(".csv"))
+        return [{ description: "CSV-файл", accept: { "text/csv": [".csv"] } }];
+      return [{ description: "Текстовый файл", accept: { "text/plain": [".txt"] } }];
     }
 
     async function saveTextFile(filename, text, mime) {
@@ -986,22 +1081,26 @@
         try {
           const handle = await window.showSaveFilePicker({
             suggestedName: filename,
-            types: [{ description: "CSV", accept: { "text/csv": [".csv"] } }]
+            types: _pickerTypes(filename)
           });
           const writable = await handle.createWritable();
           await writable.write(new Blob([text], { type: mime || "text/plain;charset=utf-8" }));
           await writable.close();
           return true;
         } catch (e) {
-          // Cancel / not allowed — ничего не делаем
           return false;
         }
       }
-
-      // fallback — обычная загрузка
-      downloadTextFile(filename, text, mime);
+      const blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.href = url; link.download = filename;
+      document.body.appendChild(link); link.click();
+      document.body.removeChild(link); URL.revokeObjectURL(url);
       return true;
     }
+
+    function downloadTextFile(filename, text, mime) { saveTextFile(filename, text, mime); }
 
     // --- Skipped modal ---
     function openSkippedModal(skipped, fileName) {
@@ -1093,38 +1192,90 @@
     });
 
     // --- Templates modal ---
-    function renderTemplatesList() {
-      templatesList.innerHTML = "";
-      columnTemplates.forEach((t, idx) => {
-        const row = document.createElement("div");
-        row.className = "template-row";
-
-        const input = document.createElement("input");
-        input.type = "text";
-        input.value = t;
-
-        input.addEventListener("input", function() {
-          columnTemplates[idx] = input.value;
-          persistColumnTemplates();
-          renderTable();
+    function renderSynonymsPanel(panel, tplName) {
+      panel.innerHTML = "";
+      const synonyms = columnSynonyms[tplName] || [];
+      const lbl = document.createElement("div"); lbl.className = "synonyms-label";
+      lbl.textContent = "Синонимы (точное совпадение, без учёта регистра):"; panel.appendChild(lbl);
+      const chipsRow = document.createElement("div"); chipsRow.className = "synonyms-chips";
+      synonyms.forEach((syn, i) => {
+        const chip = document.createElement("div"); chip.className = "synonym-chip";
+        const sinput = document.createElement("input"); sinput.type="text"; sinput.value=syn;
+        sinput.className="synonym-input"; sinput.title="Редактировать синоним";
+        sinput.addEventListener("change", function() {
+          if (!columnSynonyms[tplName]) columnSynonyms[tplName]=[];
+          columnSynonyms[tplName][i]=sinput.value.trim(); persistAll();
         });
-
-        const delBtn = document.createElement("button");
-        delBtn.className = "btn-secondary";
-        delBtn.textContent = "Удалить";
-        delBtn.addEventListener("click", function() {
-          columnTemplates.splice(idx, 1);
-          persistColumnTemplates();
-          renderTemplatesList();
-          renderTable();
+        const rb = document.createElement("button"); rb.className="synonym-remove"; rb.textContent="×"; rb.title="Удалить";
+        rb.addEventListener("click", function() {
+          if (!columnSynonyms[tplName]) return;
+          columnSynonyms[tplName].splice(i,1); persistAll(); renderSynonymsPanel(panel,tplName);
         });
-
-        row.appendChild(input);
-        row.appendChild(delBtn);
-        templatesList.appendChild(row);
+        chip.appendChild(sinput); chip.appendChild(rb); chipsRow.appendChild(chip);
       });
+      panel.appendChild(chipsRow);
+      const addRow = document.createElement("div"); addRow.className="synonym-add-row";
+      const addInput = document.createElement("input"); addInput.type="text";
+      addInput.placeholder="Новый синоним…"; addInput.className="synonym-new-input";
+      const addBtn = document.createElement("button"); addBtn.className="btn-primary";
+      addBtn.style.cssText="font-size:12px;padding:5px 10px"; addBtn.textContent="+ Добавить";
+      addBtn.addEventListener("click", function() {
+        const val = addInput.value.trim(); if (!val) return;
+        if (!columnSynonyms[tplName]) columnSynonyms[tplName]=[];
+        columnSynonyms[tplName].push(val); persistAll(); addInput.value=""; renderSynonymsPanel(panel,tplName);
+      });
+      addInput.addEventListener("keydown", e => { if (e.key==="Enter") addBtn.click(); });
+      addRow.appendChild(addInput); addRow.appendChild(addBtn); panel.appendChild(addRow);
     }
 
+    function renderTemplatesList() {
+      templatesList.innerHTML = "";
+      const total = columnTemplates.length;
+      columnTemplates.forEach((t, idx) => {
+        const block = document.createElement("div"); block.className="template-block";
+        const row = document.createElement("div"); row.className="template-row";
+        const upBtn = document.createElement("button"); upBtn.className="btn-secondary btn-icon";
+        upBtn.textContent="↑"; upBtn.title="Переместить вверх"; upBtn.disabled = idx===0;
+        upBtn.addEventListener("click", function() {
+          if (idx===0) return;
+          [columnTemplates[idx-1],columnTemplates[idx]]=[columnTemplates[idx],columnTemplates[idx-1]];
+          persistAll(); renderTemplatesList(); renderTable();
+        });
+        const downBtn = document.createElement("button"); downBtn.className="btn-secondary btn-icon";
+        downBtn.textContent="↓"; downBtn.title="Переместить вниз"; downBtn.disabled = idx===total-1;
+        downBtn.addEventListener("click", function() {
+          if (idx===total-1) return;
+          [columnTemplates[idx],columnTemplates[idx+1]]=[columnTemplates[idx+1],columnTemplates[idx]];
+          persistAll(); renderTemplatesList(); renderTable();
+        });
+        const input = document.createElement("input"); input.type="text"; input.value=t;
+        const capturedOld = t;
+        input.addEventListener("change", function() {
+          const newName = input.value.trim();
+          if (!newName || newName===capturedOld) return;
+          if (columnSynonyms[capturedOld]!==undefined) { columnSynonyms[newName]=columnSynonyms[capturedOld]; delete columnSynonyms[capturedOld]; }
+          columnTemplates[idx]=newName; persistAll(); renderTemplatesList(); renderTable();
+        });
+        const synToggle = document.createElement("button"); synToggle.className="btn-secondary syn-toggle-btn";
+        synToggle.textContent="🔤 Синонимы"; synToggle.title="Показать / скрыть синонимы";
+        synToggle.addEventListener("click", function() {
+          const p = block.querySelector(".synonyms-panel");
+          if (!p) return;
+          const shown = p.style.display!=="none";
+          p.style.display = shown ? "none" : "block";
+          synToggle.textContent = shown ? "🔤 Синонимы" : "🔤 Синонимы ▲";
+        });
+        const delBtn = document.createElement("button"); delBtn.className="btn-secondary"; delBtn.textContent="Удалить";
+        delBtn.addEventListener("click", function() {
+          columnTemplates.splice(idx,1); persistAll(); renderTemplatesList(); renderTable();
+        });
+        row.appendChild(upBtn); row.appendChild(downBtn); row.appendChild(input);
+        row.appendChild(synToggle); row.appendChild(delBtn); block.appendChild(row);
+        const synPanel = document.createElement("div"); synPanel.className="synonyms-panel"; synPanel.style.display="none";
+        renderSynonymsPanel(synPanel, t); block.appendChild(synPanel);
+        templatesList.appendChild(block);
+      });
+    }
     function openTemplatesModal() {
       renderTemplatesList();
       templatesModal.style.display = "flex";
@@ -1146,7 +1297,7 @@
       const val = newTemplateInput.value.trim();
       if (!val) return;
       columnTemplates.push(val);
-      persistColumnTemplates();
+      persistAll();
       renderTemplatesList();
       renderTable();
       newTemplateInput.value = "";
@@ -1194,7 +1345,7 @@
 
     saveAppBtn.addEventListener("click", async function() {
       const html = buildExportHtml();
-      await saveTextFile("table-to-csv-appsaved.html", html, "text/html;charset=utf-8");
+      await saveTextFile("index.html", html, "text/html;charset=utf-8");
     });
   </script>
 <script>
@@ -1208,6 +1359,7 @@
   });
 })();
 </script>
+
 
 
 </body></html>
