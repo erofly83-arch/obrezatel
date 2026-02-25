@@ -4,49 +4,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Table to CSV</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <!-- Конфиг, который вшивается в "Сохранить" -->
   <script id="userConfig" type="application/json">{
   "columnTemplates": [
-    "Цена БН",
-    "Цена НАЛ",
-    "Цена БН%",
-    "Цена НАЛ%",
-    "Цена",
-    "Штрихкод",
-    "Наименование",
-    "Остаток"
+    "Цена БН","Цена НАЛ","Цена БН%","Цена НАЛ%","Цена","Штрихкод","Наименование","Остаток"
   ],
   "columnSynonyms": {
-    "Штрихкод": [
-      "штрихкод штука",
-      "штрих-код",
-      "штрихкод",
-      "штрихкод номенклатуры",
-      "штрих код"
-    ],
-    "Наименование": [
-      "наименование товара",
-      "наименование товаров",
-      "номенклатура",
-      "наименование"
-    ],
-    "Остаток": [
-      "свободный",
-      "свободный остаток"
-    ],
-    "Цена": [
-      "входящая",
-      "входящая цена"
-    ],
-    "Цена БН": [
-      "Прайс БН"
-    ],
-    "Цена НАЛ": [
-      "Прайс 2"
-    ]
+    "Штрихкод": ["штрихкод штука","штрих-код","штрихкод","штрихкод номенклатуры","штрих код"],
+    "Наименование": ["наименование товара","наименование товаров","номенклатура","наименование"],
+    "Остаток": ["свободный","свободный остаток"],
+    "Цена": ["входящая","входящая цена"],
+    "Цена БН": ["Прайс БН"],
+    "Цена НАЛ": ["Прайс 2"]
   }
 }</script>
 
@@ -54,1434 +25,1200 @@
 /* ===== RESET ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ===== BODY & BACKGROUND ===== */
+/* ===== BODY ===== */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 55%, #a21caf 100%);
+  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-size: 14px;
+  background: #f0f0f0;
   min-height: 100vh;
   padding: 0 0 32px 0;
-  color: #1c1c1e;
+  color: #000;
 }
 
-/* ===== GLOBAL NAV ===== */
+/* ===== NAV — не трогаем ===== */
 .global-nav {
-  position: sticky;
-  top: 0;
-  z-index: 5000;
+  position: sticky; top: 0; z-index: 5000;
   background: linear-gradient(90deg, #3b6fd4 0%, #6d28d9 60%, #9c1ac4 100%);
   box-shadow: 0 4px 20px rgba(80,0,120,0.35);
-  border-bottom: none;
 }
 .global-nav__inner {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  min-height: 52px;
+  max-width: 100%; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 52px;
 }
 .global-nav__brand {
-  text-decoration: none;
-  font-weight: 800;
-  font-size: 17px;
-  color: #ffffff;
-  white-space: nowrap;
-  letter-spacing: -0.3px;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  text-decoration: none; font-weight: 800; font-size: 17px;
+  color: #fff; white-space: nowrap; letter-spacing: -0.3px; text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
-.global-nav__links {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  align-items: center;
-}
+.global-nav__links { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .global-nav__link {
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 650;
-  color: rgba(255,255,255,0.88);
-  background: rgba(255,255,255,0.13);
-  border: 1px solid rgba(255,255,255,0.22);
-  padding: 7px 14px;
-  border-radius: 999px;
-  white-space: nowrap;
-  transition: transform .12s ease, background .12s ease;
+  text-decoration: none; font-size: 13px; font-weight: 650;
+  color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.22); padding: 7px 14px;
+  border-radius: 999px; white-space: nowrap; transition: transform .12s, background .12s;
 }
-.global-nav__link:hover {
-  transform: translateY(-1px);
-  background: rgba(255,255,255,0.24);
-  color: #fff;
-}
-.global-nav__link.is-active {
-  color: #6d28d9;
-  background: #ffffff;
-  border-color: #ffffff;
-  font-weight: 700;
-}
+.global-nav__link:hover { transform: translateY(-1px); background: rgba(255,255,255,0.24); color: #fff; }
+.global-nav__link.is-active { color: #6d28d9; background: #fff; border-color: #fff; font-weight: 700; }
 
 /* ===== UPLOAD SCREEN ===== */
 .upload-screen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 52px);
-  padding: 20px;
+  display: flex; align-items: center; justify-content: center;
+  min-height: calc(100vh - 52px); padding: 20px;
+  background: #f0f0f0;
 }
 .upload-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 8px 40px rgba(80,0,120,0.22);
-  text-align: center;
-  max-width: 440px;
-  width: 100%;
-  border: 2px dashed #a78bfa;
+  background: #fff; border-radius: 4px; padding: 48px 40px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18); text-align: center;
+  max-width: 400px; width: 100%; border: 1px solid #d0d0d0;
 }
-.upload-card h1 {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 18px;
-  letter-spacing: -0.5px;
-  color: #1c1c1e;
-}
+.upload-card h1 { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: #1f1f1f; }
+.upload-card p { font-size: 13px; color: #595959; margin-top: 12px; line-height: 1.5; }
 input[type="file"] { display: none; }
 .upload-btn {
-  display: inline-block;
-  padding: 10px 24px;
-  background: #7c3aed;
-  color: #fff;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  border: none;
-  user-select: none;
-  transition: all .15s;
+  display: inline-block; padding: 9px 22px;
+  background: #217346; color: #fff; border-radius: 3px;
+  cursor: pointer; font-size: 14px; font-weight: 600;
+  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  border: 1px solid #1a5c38; user-select: none; transition: background .12s;
 }
-.upload-btn:hover { background: #6d28d9; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(124,58,237,0.35); }
+.upload-btn:hover { background: #1a5c38; }
 
-/* ===== MAIN CONTAINER ===== */
+/* ===== MAIN CARD ===== */
 .container {
-  display: none;
-  padding: 24px;
-  max-width: 100%;
-  margin: 20px 16px 0;
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(80,0,120,0.22);
+  display: none; background: #fff; border-radius: 0;
+  box-shadow: none; margin: 0;
+  border: none; border-top: 1px solid #d0d0d0; overflow: hidden;
 }
 
-/* ===== HEADER ===== */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-  padding: 12px 16px;
-  background: #f5f3ff;
-  border-radius: 14px;
-  border: 1.5px solid #ddd6fe;
+/* ===== EXCEL TITLE BAR ===== */
+.xl-titlebar {
+  background: #217346; padding: 8px 14px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
 }
-.header h1 { font-size: 22px; font-weight: 700; color: #1c1c1e; letter-spacing: -0.5px; }
-.file-input-wrapper { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-#fileNameDisplay { font-size: 12px; color: #7c3aed !important; margin-top: 3px; font-weight: 600; }
+.xl-titlebar-left { display: flex; align-items: center; gap: 12px; }
+.xl-title { font-size: 14px; font-weight: 700; color: #fff; }
+.xl-filename { font-size: 12px; color: rgba(255,255,255,0.8); }
+.xl-titlebar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-/* ===== HINT ===== */
-.hint {
-  font-size: 12px;
-  color: #6d28d9;
-  margin-bottom: 12px;
-  padding: 10px 14px;
-  background: #f5f3ff;
-  border-radius: 10px;
-  border-left: 3px solid #7c3aed;
-  line-height: 1.35;
+/* ===== EXCEL TOOLBAR (ribbon-like) ===== */
+.xl-toolbar {
+  background: #f3f3f3; border-bottom: 1px solid #d0d0d0;
+  padding: 5px 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.xl-toolbar-sep {
+  width: 1px; height: 22px; background: #c8c8c8; margin: 0 3px;
+}
+.xl-group {
+  display: flex; align-items: center; gap: 4px;
+}
+.xl-group-label {
+  font-size: 10px; color: #737373; text-align: center;
+  display: block; line-height: 1; margin-top: 1px;
 }
 
-/* ===== INFO BAR / STATS ===== */
-.info-bar {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-  font-size: 13px;
-  margin-bottom: 10px;
+/* ===== EXCEL BUTTONS ===== */
+.xl-btn {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 4px 8px; min-width: 52px;
+  background: transparent; border: 1px solid transparent;
+  border-radius: 2px; cursor: pointer;
+  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-size: 11px; color: #1f1f1f; font-weight: 400;
+  transition: background .1s, border-color .1s; white-space: nowrap;
 }
-.sheet-selector { display: none; }
-.sheet-selector select {
-  padding: 6px 10px;
-  border-radius: 10px;
-  border: 1.5px solid #c4b5fd;
-  background: #faf8ff;
-  font-size: 13px;
-  color: #1c1c1e;
-}
-.stats {
-  display: inline-flex;
-  gap: 14px;
-  padding: 8px 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  font-size: 12px;
-  align-items: center;
-  color: white;
-}
-.stat-item { display: inline-flex; gap: 6px; align-items: center; }
-.stat-item span:first-child { color: rgba(255,255,255,0.8); }
-.stat-value { font-weight: 700; color: #ffffff; }
+.xl-btn:hover:not(:disabled) { background: #e1e1e1; border-color: #c8c8c8; }
+.xl-btn:active:not(:disabled) { background: #d0d0d0; }
+.xl-btn:disabled { color: #b0b0b0; cursor: not-allowed; }
+.xl-btn .xl-icon { font-size: 18px; line-height: 1; }
+.xl-btn.xl-btn-accent { color: #217346; font-weight: 700; }
+.xl-btn.xl-btn-accent .xl-icon { font-size: 22px; }
+.xl-btn.xl-btn-accent:hover:not(:disabled) { background: #dff0e8; border-color: #8fcfb0; }
+.xl-btn.study-active { background: #fff4ce; border-color: #f0a000; color: #7a4f00; }
 
-/* ===== ACTIONS ===== */
-.actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-  align-items: center;
-  background: #f5f3ff;
-  border: 1px solid #ddd6fe;
-  border-radius: 12px;
-  padding: 8px 12px;
+/* ===== STATUS BAR ===== */
+.xl-statusbar {
+  background: #f9f9f9; border-bottom: 1px solid #e0e0e0;
+  padding: 4px 12px; display: flex; align-items: center; gap: 20px;
+  font-size: 12px; color: #595959;
 }
+.xl-stat { display: flex; align-items: center; gap: 5px; }
+.xl-stat b { color: #1f1f1f; font-weight: 600; }
 
-/* ===== BUTTONS ===== */
-button {
-  padding: 7px 12px;
-  border: none;
-  border-radius: 9px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 12px;
-  font-family: inherit;
-  transition: all 0.18s;
-  line-height: 1;
-  white-space: nowrap;
+/* ===== HINT BAR ===== */
+.xl-hint {
+  background: #fff; border-bottom: 1px solid #e8e8e8;
+  padding: 6px 12px; font-size: 12px; color: #595959; line-height: 1.5;
 }
-button:disabled {
-  background: #e5e5ea;
-  color: #aeaeb2;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  border: 1px solid #e5e5ea;
+.xl-hint b { color: #1f1f1f; }
+
+/* ===== QUEUE CHIP ===== */
+.xl-queue {
+  background: #e8f4ef; border: 1px solid #8fcfb0; border-radius: 3px;
+  padding: 5px 12px; font-size: 12px; color: #1a5c38;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
-.btn-primary { background: #7c3aed; color: white; }
-.btn-primary:hover:not(:disabled) { background: #6d28d9; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(124,58,237,0.35); }
-.btn-secondary { background: #ffffff; color: #7c3aed; border: 1.5px solid #c4b5fd; }
-.btn-secondary:hover:not(:disabled) { background: #ede9fe; border-color: #7c3aed; color: #6d28d9; }
+.xl-queue b { font-weight: 700; }
+.queue-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.queue-chip {
+  background: #d6eddf; border: 1px solid #8fcfb0; border-radius: 2px;
+  padding: 2px 8px; font-size: 11px; color: #1a5c38; font-weight: 600;
+}
 
 /* ===== TABLE ===== */
-.table-container {
-  background: #fff;
-  border: 1.5px solid #ddd6fe;
-  border-radius: 14px;
+.xl-table-wrap {
   overflow: auto;
-  max-height: calc(100vh - 230px);
+  max-height: calc(100vh - 200px);
+  background: #fff;
 }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th, td {
-  padding: 5px 10px;
-  border: 1px solid #ddd6fe;
-  min-width: 110px;
-  vertical-align: top;
+table {
+  border-collapse: collapse;
+  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-size: 13px; width: 100%;
 }
+
+/* row-number column */
+.xl-row-num {
+  background: #f2f2f2; border: 1px solid #d0d0d0;
+  font-size: 11px; color: #737373; text-align: center;
+  min-width: 36px; width: 36px; padding: 2px 4px;
+  position: sticky; left: 0; z-index: 5;
+  user-select: none; font-weight: 400;
+}
+thead .xl-row-num {
+  background: #e8e8e8; position: sticky; top: 0; left: 0; z-index: 11;
+}
+
 th {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #f5f3ff;
-  color: #6d28d9;
-  font-weight: 700;
-  font-size: 11px;
-  cursor: pointer;
-  user-select: none;
-  border-bottom: 2px solid #c4b5fd;
-  transition: background .12s;
-  letter-spacing: 0.3px;
+  position: sticky; top: 0; z-index: 10;
+  background: #e8e8e8; border: 1px solid #d0d0d0;
+  font-size: 12px; font-weight: 700; text-align: center;
+  padding: 3px 8px; cursor: pointer; user-select: none;
+  min-width: 90px; white-space: nowrap;
+  color: #1f1f1f; transition: background .1s;
 }
-th:hover { background: #ede9fe; }
-th.selected { background: #7c3aed; color: #fff; border-color: #6d28d9; }
-td { cursor: pointer; background: #fff; color: #1c1c1e; border-bottom: 1px solid #f0ebff; border-right: 1px solid #e8e0fa; }
-td:hover { background: #f8f6ff; }
-tr:hover { background: #f8f6ff; }
+th:hover:not(.xl-row-num) { background: #d8d8d8; }
+th.col-selected {
+  background: #c6efce; color: #276221;
+  border-color: #70ad47; border-bottom: 2px solid #70ad47;
+}
+
+td {
+  border: 1px solid #d0d0d0; padding: 2px 8px;
+  background: #fff; color: #000;
+  cursor: pointer; min-width: 90px; height: 20px;
+  font-size: 13px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 240px;
+}
+tr:hover td:not(.xl-row-num) { background: #e8f0fd; }
+tr:nth-child(even) td:not(.xl-row-num) { background: #f9f9f9; }
+tr:nth-child(even):hover td:not(.xl-row-num) { background: #e8f0fd; }
 .row-hidden { display: none; }
 
-/* ===== RENAME INPUT (inside selected th) ===== */
-.rename-wrapper { position: relative; width: 100%; }
+/* selected column cells */
+th.col-selected ~ th, td.cell-selected { background-color: #ebf7ed; }
+
+/* ===== RENAME INPUT ===== */
+.rename-wrapper { position: relative; }
 .rename-input {
-  width: 100%;
-  padding: 4px 6px;
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  background: rgba(255,255,255,0.18);
-  outline: none;
+  width: 100%; padding: 2px 5px; border: 2px solid #70ad47;
+  border-radius: 1px; font-size: 12px; font-weight: 700;
+  color: #276221; background: #e2efda;
+  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  outline: none; min-width: 80px;
 }
-.rename-input::placeholder { color: rgba(255,255,255,0.75); }
-.rename-input:focus { border-color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.25); }
+.rename-input:focus { border-color: #217346; }
 
 /* ===== DROPDOWN ===== */
 .dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  background: #fff;
-  border: 1.5px solid #c4b5fd;
-  border-radius: 12px;
-  box-shadow: 0 6px 24px rgba(80,0,120,0.18);
-  max-height: 320px;
-  overflow-y: auto;
-  z-index: 1000;
-  display: none;
-  min-width: 220px;
-  color: #1c1c1e;
-  text-align: left;
+  position: absolute; top: calc(100% + 2px); left: 0;
+  background: #fff; border: 1px solid #d0d0d0;
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.18);
+  max-height: 260px; overflow-y: auto;
+  z-index: 1000; display: none; min-width: 180px;
 }
 .dropdown.show { display: block; }
-.dropdown-item { color: #1c1c1e; padding: 8px 12px; cursor: pointer; font-size: 13px; white-space: nowrap; text-align: left; }
-.dropdown-item:hover { background: #f5f3ff; color: #6d28d9; }
+.dropdown-item {
+  padding: 5px 10px; cursor: pointer;
+  font-size: 13px; color: #1f1f1f; white-space: nowrap;
+  text-align: left;
+}
+.dropdown-item:hover { background: #e8f0fd; color: #1a56a0; }
 
 /* ===== LOAD MORE ===== */
-.load-more-container {
+.xl-load-more {
+  text-align: center; padding: 8px;
+  border-top: 1px solid #e0e0e0; background: #f9f9f9;
   display: none;
-  margin-top: 10px;
-  padding: 10px;
-  background: #fff;
-  border: 1.5px solid #ddd6fe;
-  border-radius: 12px;
-  text-align: center;
 }
-.btn-load-more { background: #7c3aed; color: #fff; width: 100%; }
-.btn-load-more:hover { background: #6d28d9; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(124,58,237,0.35); }
+
+/* ===== SHEET SELECTOR ===== */
+.xl-sheets { display: none; align-items: center; gap: 6px; padding: 0 12px 0 0; }
+.xl-sheets select {
+  padding: 3px 8px; border: 1px solid #d0d0d0; border-radius: 2px;
+  font-size: 12px; font-family: inherit; background: #fff; color: #1f1f1f;
+}
 
 /* ===== MODAL ===== */
 .modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(80,0,120,0.35);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 14px;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: none; align-items: center; justify-content: center;
+  z-index: 3000; padding: 16px;
 }
-.modal-content {
-  width: min(980px, 96vw);
-  background: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 12px 40px rgba(80,0,120,0.3);
+.modal-box {
+  background: #fff; border: 1px solid #c0c0c0;
+  box-shadow: 4px 4px 20px rgba(0,0,0,0.25);
+  border-radius: 3px; width: min(960px, 96vw); overflow: hidden;
 }
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 14px 18px;
-  border-bottom: 1.5px solid #ddd6fe;
-  font-weight: 800;
-  font-size: 15px;
-  color: #1c1c1e;
-  background: #f5f3ff;
+.modal-titlebar {
+  background: #217346; padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 14px; font-weight: 700; color: #fff;
 }
-.modal-body { padding: 16px; }
-.muted { color: #6d28d9; font-size: 12px; line-height: 1.35; }
+.modal-body { padding: 16px; max-height: 75vh; overflow-y: auto; }
+.modal-footer { padding: 10px 16px; border-top: 1px solid #e0e0e0; display: flex; gap: 8px; justify-content: flex-end; background: #f3f3f3; }
+
+/* ===== MODAL INFO ===== */
+.modal-note {
+  background: #fff8e1; border-left: 3px solid #f0a000;
+  padding: 10px 14px; margin-bottom: 14px;
+  font-size: 13px; line-height: 1.6; color: #3d3d3d;
+}
+.modal-note p { margin-bottom: 5px; }
+.modal-note ul { padding-left: 18px; }
+.modal-note li { margin-bottom: 3px; }
+.save-note {
+  margin-top: 8px; padding: 7px 10px;
+  background: #e8f4ef; border-left: 3px solid #217346;
+  font-size: 12px; color: #1a5c38;
+}
 
 /* ===== TEMPLATE BLOCKS ===== */
-.template-add { display: flex; gap: 8px; margin-bottom: 12px; }
-.template-add input {
-  flex: 1; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #c4b5fd;
-  font-size: 13px; font-family: inherit; background: #faf8ff; color: #1c1c1e;
+.tpl-add { display: flex; gap: 6px; margin-bottom: 10px; }
+.tpl-add input {
+  flex: 1; padding: 6px 10px; border: 1px solid #d0d0d0;
+  font-size: 13px; font-family: inherit; background: #fff; color: #1f1f1f;
+  border-radius: 2px;
 }
-.template-add input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
-.template-row { display: flex; gap: 6px; align-items: center; padding: 6px 8px; background: #faf8ff; margin: 0; }
-.template-row input {
-  flex: 1; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #c4b5fd;
-  font-size: 13px; font-family: inherit; background: #fff; color: #1c1c1e;
+.tpl-add input:focus { outline: none; border-color: #217346; }
+.tpl-block { border: 1px solid #e0e0e0; margin-bottom: 6px; background: #fff; }
+.tpl-row {
+  display: flex; gap: 5px; align-items: center;
+  padding: 5px 8px; background: #f9f9f9;
+  border-bottom: 1px solid transparent;
 }
-.template-row input:focus { outline: none; border-color: #7c3aed; }
-.template-block { border: 1.5px solid #ddd6fe; border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
-.btn-icon { padding: 4px 9px !important; min-width: 28px; font-size: 14px; line-height: 1; }
-.btn-icon:disabled { opacity: .35; }
-.synonyms-panel { padding: 8px 12px 10px; background: #f5f3ff; border-top: 1px solid #ddd6fe; }
-.synonyms-label { font-size: 11px; color: #7c3aed; margin-bottom: 6px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
-.synonyms-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; min-height: 26px; }
-.synonym-chip { display: inline-flex; align-items: center; background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 8px; padding: 2px 2px 2px 8px; gap: 2px; }
-.synonym-input { border: none; background: transparent; font-size: 12px; padding: 1px 3px; width: 130px; outline: none; color: #1c1c1e; }
-.synonym-remove { background: none; border: none; cursor: pointer; font-size: 15px; color: #a78bfa; padding: 0 3px; line-height: 1; font-weight: 700; }
-.synonym-remove:hover { color: #e11d48; background: none; }
-.synonym-add-row { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
-.synonym-new-input { flex: 1; padding: 5px 8px; border-radius: 8px; border: 1.5px solid #c4b5fd; font-size: 12px; background: #fff; font-family: inherit; }
-.synonym-new-input:focus { outline: none; border-color: #7c3aed; }
-.syn-toggle-btn { font-size: 12px !important; padding: 5px 10px !important; }
-#templatesModal .modal-body { max-height: 72vh; overflow-y: auto; }
+.tpl-row:hover { background: #f0f0f0; }
+.tpl-row input {
+  flex: 1; padding: 4px 8px; border: 1px solid #d0d0d0;
+  font-size: 13px; font-family: inherit; background: #fff; color: #1f1f1f;
+  border-radius: 2px;
+}
+.tpl-row input:focus { outline: none; border-color: #217346; }
+.syn-panel { padding: 8px 10px 10px; background: #f5f5f5; border-top: 1px solid #e8e8e8; }
+.syn-label { font-size: 11px; color: #737373; margin-bottom: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.syn-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; min-height: 24px; }
+.syn-chip {
+  display: inline-flex; align-items: center;
+  background: #e8f4ef; border: 1px solid #8fcfb0;
+  border-radius: 2px; padding: 2px 2px 2px 7px; gap: 1px;
+}
+.syn-input { border: none; background: transparent; font-size: 12px; padding: 1px 3px; width: 120px; outline: none; font-family: inherit; }
+.syn-remove { background: none; border: none; cursor: pointer; font-size: 14px; color: #888; padding: 0 4px; line-height: 1; font-weight: 700; }
+.syn-remove:hover { color: #c00; }
+.syn-add-row { display: flex; gap: 5px; }
+.syn-new-input { flex: 1; padding: 4px 8px; border: 1px solid #d0d0d0; font-size: 12px; background: #fff; font-family: inherit; border-radius: 2px; }
+.syn-new-input:focus { outline: none; border-color: #217346; }
 
-/* ===== SKIPPED ROWS MODAL ===== */
-.skipped-wrap { border: 1.5px solid #ddd6fe; border-radius: 12px; overflow: auto; max-height: 55vh; background: #fff; margin-top: 10px; }
+/* ===== SKIPPED TABLE ===== */
+.skipped-wrap { border: 1px solid #e0e0e0; overflow: auto; max-height: 50vh; background: #fff; margin-top: 8px; }
 .skipped-table th { position: sticky; top: 0; z-index: 2; cursor: default; }
-.skipped-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 10px; }
+.skipped-sum { font-size: 12px; color: #595959; margin-bottom: 6px; }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) { .container { margin: 12px 8px 0; padding: 16px; } }
-:root { --global-nav-h: 52px; }
+/* ===== STANDARD BUTTONS ===== */
+.btn {
+  padding: 5px 14px; border-radius: 2px;
+  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-size: 13px; font-weight: 400; cursor: pointer;
+  border: 1px solid #d0d0d0; background: #f3f3f3; color: #1f1f1f;
+  transition: background .1s; white-space: nowrap; line-height: 1.4;
+}
+.btn:hover:not(:disabled) { background: #e1e1e1; }
+.btn-green { background: #217346; color: #fff; border-color: #1a5c38; font-weight: 600; }
+.btn-green:hover:not(:disabled) { background: #1a5c38; }
+.btn-small { padding: 3px 8px; font-size: 12px; }
+.btn:disabled { background: #f3f3f3; color: #b0b0b0; cursor: not-allowed; }
+
+/* ===== STUDY MODE TOOLTIPS — JS-rendered ===== */
+body.study-mode [data-tip] { cursor: help !important; }
+#study-tooltip {
+  position: fixed;
+  background: #1f1f1f; color: #fff;
+  padding: 7px 11px; border-radius: 3px;
+  font-size: 12px; font-weight: 400; line-height: 1.45;
+  white-space: normal; max-width: 220px; text-align: center;
+  pointer-events: none; z-index: 99999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  display: none;
+}
+#study-tooltip::after {
+  content: '';
+  position: absolute; top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #1f1f1f;
+}
+
+@media (max-width: 768px) { .xl-toolbar { gap: 4px; } }
 </style>
 </head>
-
 <body>
+
+<!-- ===== NAV ===== -->
 <header class="global-nav">
   <div class="global-nav__inner">
-    <a class="global-nav__brand" href="https://erofly83-arch.github.io/pricematcher/">
-      Навигатор
-    </a>
-
-    <nav class="global-nav__links" aria-label="Навигация по приложениям">
-      <a class="global-nav__link" href="https://erofly83-arch.github.io/synonyms/" data-match="/synonyms/">
-        Редактор JSON
-      </a>
-      <a class="global-nav__link" href="https://erofly83-arch.github.io/pricematcher/" data-match="/pricematcher/">
-        Мониторинг
-      </a>
-      <a class="global-nav__link is-active" href="https://erofly83-arch.github.io/obrezatel/" data-match="/obrezatel/">
-        Обрезатель
-      </a>
-      <a class="global-nav__link" href="https://erofly83-arch.github.io/sininimfinder/" data-match="/sininimfinder/">
-        Поиск синонимов
-      </a>
+    <a class="global-nav__brand" href="https://erofly83-arch.github.io/pricematcher/">Навигатор</a>
+    <nav class="global-nav__links" aria-label="Навигация">
+      <a class="global-nav__link" href="https://erofly83-arch.github.io/synonyms/" data-match="/synonyms/">Редактор JSON</a>
+      <a class="global-nav__link" href="https://erofly83-arch.github.io/pricematcher/" data-match="/pricematcher/">Мониторинг</a>
+      <a class="global-nav__link is-active" href="https://erofly83-arch.github.io/obrezatel/" data-match="/obrezatel/">Обрезатель</a>
+      <a class="global-nav__link" href="https://erofly83-arch.github.io/sininimfinder/" data-match="/sininimfinder/">Поиск синонимов</a>
     </nav>
   </div>
 </header>
-  <!-- Upload -->
-  <div class="upload-screen" id="uploadScreen" style="display: flex;">
-    <div class="upload-card">
-      <h1>📊 Table to CSV</h1>
-      <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn" multiple="">
-      <label for="fileInput" class="upload-btn">Загрузить файлы</label>
-      <div style="margin-top:10px;font-size:12px;color:#7c3aed;font-weight:600;">Можно выбрать несколько файлов — они обработаются по очереди</div>
+
+<!-- Tooltip for study mode -->
+<div id="study-tooltip"></div>
+
+<!-- ===== UPLOAD ===== -->
+<div class="upload-screen" id="uploadScreen">
+  <div class="upload-card">
+    <h1>📊 Table to CSV</h1>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn" multiple>
+    <label for="fileInput" class="upload-btn">Открыть файл</label>
+    <p>Поддерживаются Excel, CSV и другие табличные форматы.<br>Можно выбрать несколько файлов сразу.</p>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="container" id="tableContainer" style="display:none;">
+
+  <!-- Title bar -->
+  <div class="xl-titlebar">
+    <div class="xl-titlebar-left">
+      <span class="xl-title">📊 Table to CSV</span>
+      <span class="xl-filename" id="fileNameDisplay"></span>
+    </div>
+    <div class="xl-titlebar-right">
+      <div class="xl-sheets" id="sheetSelector">
+        <span style="font-size:12px;color:rgba(255,255,255,0.8);">Лист:</span>
+        <select id="sheetSelect"></select>
+      </div>
+      <input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn" multiple>
+      <label for="fileInput2" class="btn btn-small" style="background:#2e8b5a;color:#fff;border-color:#1a5c38;cursor:pointer;"
+        data-tip="Открыть другой прайс-лист. Можно выбрать несколько файлов — они встанут в очередь и откроются по одному после сохранения каждого CSV.">
+        📂 Открыть другой файл
+      </label>
     </div>
   </div>
 
-  <!-- Main -->
-  <div class="container" id="tableContainer" style="display: none;">
-    <div class="header">
+  <!-- Toolbar (ribbon) -->
+  <div class="xl-toolbar">
+
+    <!-- Группа: выгрузка -->
+    <div class="xl-group">
+      <button class="xl-btn xl-btn-accent" id="downloadBtn" disabled
+        data-tip="Выгрузить выбранные колонки в CSV-файл. Штрихкоды проверяются автоматически. Кнопка активна, когда выбрана хотя бы одна колонка.">
+        <span class="xl-icon">⬇️</span>
+        <span>Скачать CSV</span>
+      </button>
+    </div>
+
+    <div class="xl-toolbar-sep"></div>
+
+    <!-- Группа: правка -->
+    <div class="xl-group">
+      <button class="xl-btn" id="resetBtn"
+        data-tip="Снять выделение со всех колонок и отменить скрытие строк. Файл остаётся загруженным.">
+        <span class="xl-icon">↩️</span>
+        <span>Сбросить</span>
+      </button>
+    </div>
+
+    <div class="xl-toolbar-sep"></div>
+
+    <!-- Группа: настройки -->
+    <div class="xl-group">
+      <button class="xl-btn" id="manageTemplatesBtn"
+        data-tip="Редактировать список наименований колонок и синонимы для автоматического распознавания.">
+        <span class="xl-icon">🏷️</span>
+        <span>Названия колонок</span>
+      </button>
+      <button class="xl-btn" id="saveAppBtn"
+        data-tip="Сохранить приложение (index.html) с вашими настройками. Замените старый файл новым — настройки сохранятся навсегда.">
+        <span class="xl-icon">💾</span>
+        <span>Сохранить приложение</span>
+      </button>
+    </div>
+
+    <div class="xl-toolbar-sep"></div>
+
+    <!-- Группа: справка -->
+    <div class="xl-group">
+      <button class="xl-btn" id="studyModeBtn"
+        data-tip="Включить режим обучения: при наведении на любой элемент появится подсказка с объяснением.">
+        <span class="xl-icon">🎓</span>
+        <span>Справка</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Status bar -->
+  <div class="xl-statusbar">
+    <div class="xl-stat" data-tip="Всего столбцов в загруженном файле">
+      Столбцов: <b id="totalColumns">0</b>
+    </div>
+    <div class="xl-stat" data-tip="Сколько столбцов выделено для выгрузки в CSV">
+      Выбрано: <b id="selectedColumns">0</b>
+    </div>
+    <div class="xl-stat" data-tip="Количество строк, которые попадут в итоговый CSV (без скрытых)">
+      Строк: <b id="totalRows">0</b>
+    </div>
+    <div id="queueStatus" style="margin-left:auto;display:none;" class="xl-stat"
+      data-tip="В очереди ещё есть файлы. После сохранения CSV они откроются автоматически.">
+    </div>
+  </div>
+
+  <!-- Queue -->
+  <div id="queuePanel" style="display:none;padding:6px 12px;border-bottom:1px solid #e0e0e0;">
+    <div class="xl-queue">
       <div>
-        <h1>📊 Table to CSV</h1>
-        <div id="fileNameDisplay" style="font-size:12px;color:#555;margin-top:3px;">📂 Вост нал и банк 17.02.xls</div>
+        <b>Очередь файлов:</b>
+        <span id="queueCurrent" style="margin-left:6px;"></span>
       </div>
-
-      <div class="file-input-wrapper">
-        <input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn" multiple="">
-        <label for="fileInput2" class="upload-btn" style="padding: 6px 14px; font-size: 13px;">Загрузить другой файл</label>
-
-        <div class="sheet-selector" id="sheetSelector" style="display: none;">
-          <select id="sheetSelect"></select>
-        </div>
-      </div>
-    </div>
-
-    <div class="hint">
-      <strong>Инструкция:</strong> После загрузки файла колонки определяются автоматически по ключевым словам в первых 15 строках. Клик по заголовку выбирает/снимает колонку → можно выбрать или ввести название вручную → клик по строке скрывает все строки выше.
-    </div>
-
-    <!-- Queue panel -->
-    <div id="queuePanel" style="display: none; margin-bottom: 12px; padding: 10px 14px; background: rgb(250, 245, 255); border: 1.5px solid rgb(196, 181, 253); border-radius: 12px; font-size: 12px; color: rgb(76, 29, 149);">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span style="font-weight:800;font-size:13px;">📋 Очередь:</span>
-        <span id="queueCurrent" style="background:#7c3aed;color:#fff;border-radius:8px;padding:3px 10px;font-weight:700;white-space:nowrap;">▶ Арс банк 17.02</span>
-        <span id="queueStatus" style="color:#7c3aed;font-weight:600;">Ожидают: 1 файл</span>
-      </div>
-      <div id="queueList" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;"><span style="background: rgb(237, 233, 254); border: 1px solid rgb(196, 181, 253); border-radius: 8px; padding: 3px 10px; color: rgb(109, 40, 217); font-weight: 600; white-space: nowrap;">1. Вост нал и банк 17.02.xls</span></div>
-    </div>
-
-    <div class="info-bar">
-      <div class="stats">
-        <div class="stat-item"><span>Колонок:</span><span class="stat-value" id="totalColumns">0</span></div>
-        <div class="stat-item"><span>Выбрано:</span><span class="stat-value" id="selectedColumns">0</span></div>
-        <div class="stat-item"><span>Строк:</span><span class="stat-value" id="totalRows">0</span></div>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="btn-primary" id="downloadBtn" disabled="">⬇️ Скачать CSV</button>
-      <button class="btn-secondary" id="resetBtn">🔄 Сбросить</button>
-      <button class="btn-secondary" id="manageTemplatesBtn">📝 Наименования</button>
-      <button class="btn-secondary" id="saveAppBtn">💾 Сохранить</button>
-    </div>
-
-    <div class="table-container">
-      <table id="dataTable"></table>
-    </div>
-
-    <div class="load-more-container" id="loadMoreContainer" style="display: none;">
-      <button class="btn-load-more" id="loadMoreBtn">Показать все строки (<span id="remainingRows">0</span>)</button>
+      <div id="queueList" class="queue-chips"></div>
     </div>
   </div>
 
-  <!-- Templates modal -->
-  <div class="modal" id="templatesModal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div>Наименования колонок</div>
-        <button class="btn-secondary" id="closeTemplatesModal">Закрыть</button>
-      </div>
-      <div class="modal-body">
-        <div class="template-add">
-          <input id="newTemplateInput" type="text" placeholder="Добавить вариант (например: Штрихкод)">
-          <button class="btn-primary" id="addTemplateBtn">Добавить</button>
-        </div>
-        <div id="templatesList"><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх" disabled="">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы ▲</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: block;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз" disabled="">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div></div>
-        <div class="hint" style="margin-top: 10px;">
-          Изменения попадут в выпадающий список и сохранятся в файл при нажатии «Сохранить».
-        </div>
-      </div>
-    </div>
+  <!-- Hint -->
+  <div class="xl-hint" id="mainHint">
+    <b>Как работать:</b>
+    кликните по заголовку столбца — выберите название из списка или введите своё.
+    После выбора нужных столбцов нажмите «Скачать CSV».
   </div>
 
-  <!-- Skipped modal -->
-  <div class="modal" id="skippedModal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div>Пропущенные строки</div>
-        <button class="btn-secondary" id="closeSkippedModal">Закрыть</button>
-      </div>
-      <div class="modal-body">
-        <div id="skippedSummary" class="muted">Всего пропусков: 476. Скрыто пустых: 472. Показано: 4.</div>
-
-        <div class="skipped-wrap">
-          <table class="skipped-table" id="skippedTable"><thead><tr><th style="min-width:90px;">Строка</th><th style="min-width:240px;">Штрихкод (как в файле)</th><th style="min-width:240px;">Нормализованный</th><th style="min-width:260px;">Причина</th></tr></thead><tbody><tr><td>2</td><td>Штрих-код</td><td></td><td>Некорректный штрихкод</td></tr><tr><td>2151</td><td>7CP-5GP-0100</td><td></td><td>Некорректный штрихкод</td></tr><tr><td>4668</td><td>2020-08</td><td></td><td>Некорректный штрихкод</td></tr><tr><td>4670</td><td>2021-08</td><td></td><td>Некорректный штрихкод</td></tr></tbody></table>
-        </div>
-
-        <div class="skipped-actions">
-          <button class="btn-secondary" id="downloadSkippedBtn">⬇️ Скачать список пропусков</button>
-          <button class="btn-primary" id="confirmDownloadCsvBtn">⬇️ Скачать CSV</button>
-        </div>
-
-        <div class="muted" style="margin-top: 8px;">
-          Примечание: CSV будет скачан даже при наличии пропусков. Вы можете закрыть это окно, исправить данные/выбор колонок и скачать снова.
-        </div>
-      </div>
-    </div>
+  <!-- Table -->
+  <div class="xl-table-wrap">
+    <table id="dataTable"></table>
   </div>
 
-  <script>
-    // --- Editable templates ---
-    const DEFAULT_COLUMN_TEMPLATES = [
-      "Штрихкод",
-      "EAN",
-      "Артикул",
-      "Наименование",
-      "Бренд",
-      "Категория",
-      "Количество",
-      "Цена",
-      "Сумма",
-      "Склад",
-      "300..",
-      "750.."
-    ];
+  <!-- Load more -->
+  <div class="xl-load-more" id="loadMoreContainer">
+    <button class="btn" id="loadMoreBtn"
+      data-tip="Показать все строки файла. По умолчанию отображаются первые 50 строк для быстрой загрузки.">
+      Показать все строки (ещё <span id="remainingRows">0</span>)
+    </button>
+  </div>
 
-    function getUserConfig() {
-      const el = document.getElementById("userConfig");
-      if (!el) return {};
-      try { return JSON.parse(el.textContent || "{}"); } catch { return {}; }
-    }
-    function setUserConfig(cfg) {
-      const el = document.getElementById("userConfig");
-      if (!el) return;
-      el.textContent = JSON.stringify(cfg, null, 2);
-    }
+</div><!-- /container -->
 
-    function loadColumnTemplates() {
-      const cfg = getUserConfig();
-      if (Array.isArray(cfg.columnTemplates) && cfg.columnTemplates.length) return cfg.columnTemplates;
+<!-- ===== MODAL: Наименования ===== -->
+<div class="modal" id="templatesModal">
+  <div class="modal-box">
+    <div class="modal-titlebar">
+      <span>🏷️ Названия колонок</span>
+      <button class="btn btn-small" id="closeTemplatesModal" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">✕ Закрыть</button>
+    </div>
+    <div class="modal-body">
 
-      const raw = localStorage.getItem("columnTemplates");
-      if (raw) {
-        try {
-          const arr = JSON.parse(raw);
-          if (Array.isArray(arr) && arr.length) return arr;
-        } catch {}
-      }
-      return DEFAULT_COLUMN_TEMPLATES.slice();
-    }
+      <div class="modal-note">
+        <p><b>Что это и зачем?</b> Здесь хранится список стандартных названий колонок, которые вы используете в работе: «Штрихкод», «Наименование», «Цена» и т.д.</p>
+        <ul>
+          <li>Добавьте нужное название — и оно появится в выпадающем списке при выборе колонки в таблице.</li>
+          <li>У каждого названия есть <b>синонимы</b> — слова, по которым колонка находится <em>автоматически</em> при загрузке прайса. Например, «Штрихкод» → добавьте синонимы «barcode», «штрих-код», «код товара» — и приложение само найдёт нужный столбец.</li>
+          <li>Стрелки ↑↓ меняют порядок и приоритет при авто-определении.</li>
+        </ul>
+        <div class="save-note">
+          💾 <b>Чтобы настройки сохранились навсегда:</b> закройте это окно → нажмите «💾 Сохранить» → замените старый файл index.html новым.
+        </div>
+      </div>
 
-    const DEFAULT_COLUMN_SYNONYMS = {
-      "Штрихкод":     ["штрихкод штука", "штрих-код", "штрихкод", "barcode", "ean"],
-      "Наименование": ["наименование товара", "наименование товаров", "номенклатура", "наименование"],
-      "Остаток":      ["свободный"],
-      "Цена":         ["входящая"]
-    };
-    function loadColumnSynonyms() {
-      const cfg = getUserConfig();
-      if (cfg.columnSynonyms && typeof cfg.columnSynonyms === "object") return cfg.columnSynonyms;
-      const raw = localStorage.getItem("columnSynonyms");
-      if (raw) { try { const o = JSON.parse(raw); if (o && typeof o === "object") return o; } catch {} }
-      return JSON.parse(JSON.stringify(DEFAULT_COLUMN_SYNONYMS));
-    }
-    function persistAll() {
-      const cfg = getUserConfig();
-      cfg.columnTemplates = columnTemplates.slice();
-      cfg.columnSynonyms = columnSynonyms;
-      setUserConfig(cfg);
-      localStorage.setItem("columnTemplates", JSON.stringify(columnTemplates));
-      localStorage.setItem("columnSynonyms", JSON.stringify(columnSynonyms));
-    }
-    function persistColumnTemplates() { persistAll(); }
-    let columnTemplates = loadColumnTemplates();
-    let columnSynonyms  = loadColumnSynonyms();
-    persistAll();
+      <div class="tpl-add">
+        <input id="newTemplateInput" type="text" placeholder="Название новой колонки, например: Артикул">
+        <button class="btn btn-green" id="addTemplateBtn">+ Добавить</button>
+      </div>
+      <div id="templatesList"></div>
 
-    // --- App state ---
-    let tableData = null;
-    let selectedColumns = new Map(); // colIndex -> userName
-    let startRowIndex = 0;
-    let currentWorkbook = null;
-    let displayedRows = 50;
-    let activeDropdown = null;
-    let originalFileName = "export";
+    </div>
+  </div>
+</div>
 
-    // Queue state
-    let fileQueue = []; // Array of File objects waiting to be processed
+<!-- ===== MODAL: Пропущенные строки ===== -->
+<div class="modal" id="skippedModal">
+  <div class="modal-box">
+    <div class="modal-titlebar">
+      <span>⚠️ Пропущенные строки</span>
+      <button class="btn btn-small" id="closeSkippedModal" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">✕ Закрыть</button>
+    </div>
+    <div class="modal-body">
+      <div id="skippedSummary" class="skipped-sum"></div>
+      <div class="skipped-wrap">
+        <table class="skipped-table" id="skippedTable"></table>
+      </div>
+      <p style="font-size:12px;color:#737373;margin-top:8px;">CSV будет скачан даже при наличии пропусков. Можно закрыть окно, исправить данные и скачать снова.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="downloadSkippedBtn">📋 Показать список пропусков</button>
+      <button class="btn btn-green" id="confirmDownloadCsvBtn">⬇️ Скачать CSV</button>
+    </div>
+  </div>
+</div>
 
-    // download-pending
-    let pendingCsvContent = null;
-    let pendingCsvFileName = null;
-    let pendingSkippedRows = [];
+<script>
+// ===== CONFIG =====
+function getUserConfig() {
+  const el = document.getElementById("userConfig");
+  if (!el) return {};
+  try { return JSON.parse(el.textContent || "{}"); } catch { return {}; }
+}
+function setUserConfig(cfg) {
+  const el = document.getElementById("userConfig");
+  if (el) el.textContent = JSON.stringify(cfg, null, 2);
+}
 
-    // Remember last save location: first save opens Desktop, then reuses chosen folder
-    let lastSaveHandle = null;
+const DEFAULT_COLUMN_TEMPLATES = ["Штрихкод","EAN","Артикул","Наименование","Бренд","Категория","Количество","Цена","Сумма","Склад"];
+const DEFAULT_COLUMN_SYNONYMS = {
+  "Штрихкод": ["штрихкод штука","штрих-код","штрихкод","barcode","ean"],
+  "Наименование": ["наименование товара","наименование товаров","номенклатура","наименование"],
+  "Остаток": ["свободный"],
+  "Цена": ["входящая"]
+};
 
-    // --- DOM refs ---
-    const uploadScreen = document.getElementById("uploadScreen");
-    const fileInput = document.getElementById("fileInput");
-    const fileInput2 = document.getElementById("fileInput2");
-    const tableContainer = document.getElementById("tableContainer");
-    const dataTable = document.getElementById("dataTable");
+function loadColumnTemplates() {
+  const cfg = getUserConfig();
+  if (Array.isArray(cfg.columnTemplates) && cfg.columnTemplates.length) return cfg.columnTemplates;
+  try { const a = JSON.parse(localStorage.getItem("columnTemplates")||"[]"); if (a.length) return a; } catch {}
+  return DEFAULT_COLUMN_TEMPLATES.slice();
+}
+function loadColumnSynonyms() {
+  const cfg = getUserConfig();
+  if (cfg.columnSynonyms && typeof cfg.columnSynonyms === "object") return cfg.columnSynonyms;
+  try { const o = JSON.parse(localStorage.getItem("columnSynonyms")||"{}"); if (Object.keys(o).length) return o; } catch {}
+  return JSON.parse(JSON.stringify(DEFAULT_COLUMN_SYNONYMS));
+}
+function persistAll() {
+  const cfg = getUserConfig();
+  cfg.columnTemplates = columnTemplates.slice();
+  cfg.columnSynonyms = columnSynonyms;
+  setUserConfig(cfg);
+  localStorage.setItem("columnTemplates", JSON.stringify(columnTemplates));
+  localStorage.setItem("columnSynonyms", JSON.stringify(columnSynonyms));
+}
 
-    const downloadBtn = document.getElementById("downloadBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const manageTemplatesBtn = document.getElementById("manageTemplatesBtn");
-    const saveAppBtn = document.getElementById("saveAppBtn");
-    const fileNameDisplay = document.getElementById("fileNameDisplay");
+let columnTemplates = loadColumnTemplates();
+let columnSynonyms  = loadColumnSynonyms();
+persistAll();
 
-    const sheetSelector = document.getElementById("sheetSelector");
-    const sheetSelect = document.getElementById("sheetSelect");
+// ===== STATE =====
+let tableData = null;
+let selectedColumns = new Map();
+let startRowIndex = 0;
+let currentWorkbook = null;
+let displayedRows = 50;
+let activeDropdown = null;
+let originalFileName = "export";
+let fileQueue = [];
+let pendingCsvContent = null;
+let pendingCsvFileName = null;
+let pendingSkippedRows = [];
+let lastSaveHandle = null;
+let studyMode = false;
 
-    const loadMoreBtn = document.getElementById("loadMoreBtn");
-    const loadMoreContainer = document.getElementById("loadMoreContainer");
+// ===== DOM =====
+const uploadScreen   = document.getElementById("uploadScreen");
+const fileInput      = document.getElementById("fileInput");
+const fileInput2     = document.getElementById("fileInput2");
+const tableContainer = document.getElementById("tableContainer");
+const dataTable      = document.getElementById("dataTable");
+const downloadBtn    = document.getElementById("downloadBtn");
+const resetBtn       = document.getElementById("resetBtn");
+const manageTemplatesBtn = document.getElementById("manageTemplatesBtn");
+const saveAppBtn     = document.getElementById("saveAppBtn");
+const fileNameDisplay = document.getElementById("fileNameDisplay");
+const sheetSelector  = document.getElementById("sheetSelector");
+const sheetSelect    = document.getElementById("sheetSelect");
+const loadMoreBtn    = document.getElementById("loadMoreBtn");
+const loadMoreContainer = document.getElementById("loadMoreContainer");
+const templatesModal = document.getElementById("templatesModal");
+const closeTemplatesModal = document.getElementById("closeTemplatesModal");
+const newTemplateInput = document.getElementById("newTemplateInput");
+const addTemplateBtn = document.getElementById("addTemplateBtn");
+const templatesList  = document.getElementById("templatesList");
+const skippedModal   = document.getElementById("skippedModal");
+const closeSkippedModal = document.getElementById("closeSkippedModal");
+const skippedSummary = document.getElementById("skippedSummary");
+const skippedTable   = document.getElementById("skippedTable");
+const confirmDownloadCsvBtn = document.getElementById("confirmDownloadCsvBtn");
+const downloadSkippedBtn = document.getElementById("downloadSkippedBtn");
+const studyModeBtn   = document.getElementById("studyModeBtn");
 
-    const templatesModal = document.getElementById("templatesModal");
-    const closeTemplatesModal = document.getElementById("closeTemplatesModal");
-    const newTemplateInput = document.getElementById("newTemplateInput");
-    const addTemplateBtn = document.getElementById("addTemplateBtn");
-    const templatesList = document.getElementById("templatesList");
+// ===== STUDY MODE =====
+studyModeBtn.addEventListener("click", function() {
+  studyMode = !studyMode;
+  document.body.classList.toggle("study-mode", studyMode);
+  studyModeBtn.classList.toggle("study-active", studyMode);
+  studyModeBtn.querySelector("span:last-child").textContent = studyMode ? "Справка ВКЛ" : "Справка";
+});
 
-    const skippedModal = document.getElementById("skippedModal");
-    const closeSkippedModal = document.getElementById("closeSkippedModal");
-    const skippedSummary = document.getElementById("skippedSummary");
-    const skippedTable = document.getElementById("skippedTable");
-    const confirmDownloadCsvBtn = document.getElementById("confirmDownloadCsvBtn");
-    const downloadSkippedBtn = document.getElementById("downloadSkippedBtn");
+// ===== CLOSE DROPDOWN =====
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".rename-wrapper") && !e.target.closest(".modal-box") && activeDropdown) {
+    activeDropdown.classList.remove("show");
+    activeDropdown = null;
+  }
+});
 
-    // Close dropdown on outside click
-    document.addEventListener("click", function(e) {
-      const inRename = !!e.target.closest(".rename-wrapper");
-      const inModal = !!e.target.closest(".modal-content");
-      if (!inRename && !inModal && activeDropdown) {
-        activeDropdown.classList.remove("show");
-        activeDropdown = null;
-      }
-    });
+// ===== QUEUE =====
+function declFiles(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return "файл";
+  if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return "файла";
+  return "файлов";
+}
+function renderQueuePanel() {
+  const panel = document.getElementById("queuePanel");
+  const queueList = document.getElementById("queueList");
+  const queueCurrent = document.getElementById("queueCurrent");
+  const queueStatusEl = document.getElementById("queueStatus");
 
-    // --- Queue functions ---
-    function renderQueuePanel() {
-      const panel = document.getElementById("queuePanel");
-      const queueList = document.getElementById("queueList");
-      const queueCurrent = document.getElementById("queueCurrent");
-      const queueStatus = document.getElementById("queueStatus");
+  if (fileQueue.length === 0) {
+    panel.style.display = "none";
+    queueStatusEl.style.display = "none";
+    return;
+  }
+  panel.style.display = "block";
+  queueStatusEl.style.display = "flex";
+  queueCurrent.textContent = "▶ " + originalFileName;
+  queueStatusEl.innerHTML = `В очереди: <b style="margin-left:4px">${fileQueue.length} ${declFiles(fileQueue.length)}</b>`;
+  queueList.innerHTML = "";
+  fileQueue.forEach((f, i) => {
+    const chip = document.createElement("span");
+    chip.className = "queue-chip";
+    chip.textContent = (i + 1) + ". " + f.name;
+    queueList.appendChild(chip);
+  });
+}
 
-      if (fileQueue.length === 0) {
-        panel.style.display = "none";
-        return;
-      }
-
-      panel.style.display = "block";
-      queueCurrent.textContent = "▶ " + originalFileName;
-      queueStatus.textContent = "Ожидают: " + fileQueue.length + " " + declFiles(fileQueue.length);
-
-      queueList.innerHTML = "";
-      fileQueue.forEach((f, i) => {
-        const chip = document.createElement("span");
-        chip.style.cssText = "background:#ede9fe;border:1px solid #c4b5fd;border-radius:8px;padding:3px 10px;color:#6d28d9;font-weight:600;white-space:nowrap;";
-        chip.textContent = (i + 1) + ". " + f.name;
-        queueList.appendChild(chip);
-      });
-    }
-
-    function declFiles(n) {
-      if (n % 10 === 1 && n % 100 !== 11) return "файл";
-      if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return "файла";
-      return "файлов";
-    }
-
-    function loadFileObject(file) {
-      originalFileName = (file.name || "export").replace(/\.[^.]+$/, "");
-      if (fileNameDisplay) fileNameDisplay.textContent = "📂 " + (file.name || "");
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        try {
-          currentWorkbook = XLSX.read(data, { type: "array" });
-
-          if (currentWorkbook.SheetNames.length > 1) {
-            sheetSelect.innerHTML = "";
-            currentWorkbook.SheetNames.forEach((name, index) => {
-              const option = document.createElement("option");
-              option.value = String(index);
-              option.textContent = name;
-              sheetSelect.appendChild(option);
-            });
-            sheetSelector.style.display = "block";
-          } else {
-            sheetSelector.style.display = "none";
-          }
-
-          loadSheet(0);
-          uploadScreen.style.display = "none";
-          tableContainer.style.display = "block";
-          renderQueuePanel();
-        } catch (err) {
-          alert(err && err.message ? err.message : String(err));
-          console.error(err);
-          // Try loading next on error
-          loadNextFromQueue();
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-
-    function loadNextFromQueue() {
-      if (fileQueue.length === 0) {
-        // Queue exhausted - reset to upload screen after short delay
-        tableData = null;
-        selectedColumns.clear();
-        startRowIndex = 0;
-        currentWorkbook = null;
-        uploadScreen.style.display = "flex";
-        tableContainer.style.display = "none";
-        document.getElementById("queuePanel").style.display = "none";
-        return;
-      }
-
-      const nextFile = fileQueue.shift();
-      // Reset state for new file
-      selectedColumns.clear();
-      startRowIndex = 0;
-      displayedRows = 50;
-      loadFileObject(nextFile);
-    }
-
-    // --- File load ---
-    fileInput.addEventListener("change", handleFileUpload);
-    fileInput2.addEventListener("change", handleFileUpload);
-
-    function handleFileUpload(event) {
-      const files = event.target.files;
-      if (!files || files.length === 0) return;
-
-      if (files.length === 1) {
-        // Single file - just load it, no queue change
-        fileQueue = [];
-        loadFileObject(files[0]);
+function loadFileObject(file) {
+  originalFileName = (file.name || "export").replace(/\.[^.]+$/, "");
+  fileNameDisplay.textContent = file.name || "";
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    try {
+      currentWorkbook = XLSX.read(data, { type: "array" });
+      if (currentWorkbook.SheetNames.length > 1) {
+        sheetSelect.innerHTML = "";
+        currentWorkbook.SheetNames.forEach((name, idx) => {
+          const o = document.createElement("option");
+          o.value = String(idx); o.textContent = name;
+          sheetSelect.appendChild(o);
+        });
+        sheetSelector.style.display = "flex";
       } else {
-        // Multiple files - first goes to display, rest queue up
-        const arr = Array.from(files);
-        fileQueue = arr.slice(1);
-        loadFileObject(arr[0]);
+        sheetSelector.style.display = "none";
       }
-
-      // Reset the input so same files can be re-selected
-      event.target.value = "";
+      loadSheet(0);
+      uploadScreen.style.display = "none";
+      tableContainer.style.display = "block";
+      renderQueuePanel();
+    } catch(err) {
+      alert(err && err.message ? err.message : String(err));
+      loadNextFromQueue();
     }
+  };
+  reader.readAsArrayBuffer(file);
+}
 
-    sheetSelect.addEventListener("change", function() {
-      const idx = parseInt(sheetSelect.value, 10) || 0;
-      loadSheet(idx);
-    });
+function loadNextFromQueue() {
+  if (fileQueue.length === 0) {
+    tableData = null; selectedColumns.clear(); startRowIndex = 0; currentWorkbook = null;
+    uploadScreen.style.display = "flex"; tableContainer.style.display = "none";
+    document.getElementById("queuePanel").style.display = "none";
+    return;
+  }
+  const next = fileQueue.shift();
+  selectedColumns.clear(); startRowIndex = 0; displayedRows = 50;
+  loadFileObject(next);
+}
 
-    // --- Auto-detect column names from first 15 rows (exact match, case-insensitive) ---
-    function autoDetectColumns() {
-      if (!tableData || tableData.length === 0) return;
-      const SCAN_ROWS = 15;
-      const maxCols = Math.max(0, ...tableData.map(r => r ? r.length : 0));
-      for (let col = 0; col < maxCols; col++) {
-        if (selectedColumns.has(col)) continue;
-        for (let row = 0; row < Math.min(SCAN_ROWS, tableData.length); row++) {
-          const cell = (tableData[row] || [])[col];
-          if (cell === undefined || cell === null) continue;
-          const norm = String(cell).toLowerCase().replace(/\s+/g, " ").trim();
-          if (!norm) continue;
-          let matched = false;
-          for (const tplName of columnTemplates) {
-            const synonyms = (columnSynonyms[tplName] || []).filter(Boolean);
-            for (const syn of synonyms) {
-              const synNorm = syn.toLowerCase().replace(/\s+/g, " ").trim();
-              // Точное совпадение без учёта регистра
-              if (synNorm && norm === synNorm) {
-                selectedColumns.set(col, tplName);
-                matched = true;
-                break;
-              }
-            }
-            if (matched) break;
+fileInput.addEventListener("change", handleFileUpload);
+fileInput2.addEventListener("change", handleFileUpload);
+
+function handleFileUpload(e) {
+  const files = e.target.files;
+  if (!files || !files.length) return;
+  const arr = Array.from(files);
+  if (arr.length === 1) { fileQueue = []; loadFileObject(arr[0]); }
+  else { fileQueue = arr.slice(1); loadFileObject(arr[0]); }
+  e.target.value = "";
+}
+
+sheetSelect.addEventListener("change", function() {
+  loadSheet(parseInt(sheetSelect.value, 10) || 0);
+});
+
+// ===== AUTO-DETECT =====
+function autoDetectColumns() {
+  if (!tableData || !tableData.length) return;
+  const SCAN = 15;
+  const maxCols = Math.max(0, ...tableData.map(r => r ? r.length : 0));
+  for (let col = 0; col < maxCols; col++) {
+    if (selectedColumns.has(col)) continue;
+    for (let row = 0; row < Math.min(SCAN, tableData.length); row++) {
+      const cell = (tableData[row] || [])[col];
+      if (cell == null) continue;
+      const norm = String(cell).toLowerCase().replace(/\s+/g, " ").trim();
+      if (!norm) continue;
+      let matched = false;
+      for (const tpl of columnTemplates) {
+        for (const syn of (columnSynonyms[tpl] || []).filter(Boolean)) {
+          if (norm === syn.toLowerCase().replace(/\s+/g, " ").trim()) {
+            selectedColumns.set(col, tpl); matched = true; break;
           }
-          if (matched) break;
         }
+        if (matched) break;
       }
+      if (matched) break;
     }
+  }
+}
 
-        function loadSheet(sheetIndex) {
-      if (!currentWorkbook) return;
-      const sheetName = currentWorkbook.SheetNames[sheetIndex];
-      const worksheet = currentWorkbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "", raw: true });
+function loadSheet(idx) {
+  if (!currentWorkbook) return;
+  const ws = currentWorkbook.Sheets[currentWorkbook.SheetNames[idx]];
+  tableData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "", raw: true });
+  startRowIndex = 0; selectedColumns.clear(); displayedRows = Math.min(50, tableData.length);
+  autoDetectColumns(); renderTable(); updateLoadMore();
+}
 
-      tableData = jsonData;
-      startRowIndex = 0;
-      selectedColumns.clear();
-      displayedRows = Math.min(50, tableData.length);
+// ===== RENDER =====
+function esc(t) {
+  return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
 
-      autoDetectColumns();
-      renderTable();
-      updateLoadMoreButton();
+function renderTable() {
+  if (!tableData || !tableData.length) { dataTable.innerHTML = "<tr><td>Нет данных</td></tr>"; updateStats(); return; }
+  const maxCols = Math.max(0, ...tableData.map(r => r ? r.length : 0));
+  const rowsToShow = Math.min(displayedRows, tableData.length);
+
+  let html = "<thead><tr>";
+  html += `<th class="xl-row-num" title="">#</th>`;
+  for (let i = 0; i < maxCols; i++) {
+    const sel = selectedColumns.has(i);
+    html += `<th class="${sel ? "col-selected" : ""}" data-col="${i}">`;
+    if (sel) html += createRenameInput(i, selectedColumns.get(i));
+    else html += esc(String(i + 1));
+    html += "</th>";
+  }
+  html += "</tr></thead><tbody>";
+
+  for (let ri = 0; ri < rowsToShow; ri++) {
+    const row = tableData[ri] || [];
+    const hidden = ri < startRowIndex;
+    html += `<tr class="${hidden ? "row-hidden" : ""}" data-row-index="${ri}">`;
+    html += `<td class="xl-row-num">${ri + 1}</td>`;
+    for (let i = 0; i < maxCols; i++) {
+      const v = row[i] != null ? row[i] : "";
+      const selClass = selectedColumns.has(i) ? ' style="background:#ebf7ed;"' : '';
+      html += `<td data-row="${ri}" data-col="${i}"${selClass}>${esc(v)}</td>`;
     }
+    html += "</tr>";
+  }
+  html += "</tbody>";
+  dataTable.innerHTML = html;
+  attachEvents();
+  updateStats();
+}
 
-    // --- Render ---
-    function escapeHtml(text) {
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+function createRenameInput(colIndex, value) {
+  const ev = String(value || "").replaceAll('"', "&quot;");
+  const items = columnTemplates.filter(Boolean).map(t =>
+    `<div class="dropdown-item" data-value="${String(t).replaceAll('"','&quot;')}">${esc(t)}</div>`
+  ).join("");
+  return `<div class="rename-wrapper" data-col="${colIndex}">
+    <input class="rename-input" type="text" value="${ev}" data-col="${colIndex}" placeholder="Название">
+    <div class="dropdown" data-col="${colIndex}">${items}</div>
+  </div>`;
+}
 
-    function renderTable() {
-      if (!tableData || tableData.length === 0) {
-        dataTable.innerHTML = "<tr><td>Нет данных</td></tr>";
-        updateStats();
-        return;
-      }
+function openDropdown(colIndex, doFocus) {
+  const input = document.querySelector(`.rename-input[data-col="${colIndex}"]`);
+  const dd = document.querySelector(`.dropdown[data-col="${colIndex}"]`);
+  if (!input || !dd) return;
+  if (activeDropdown && activeDropdown !== dd) activeDropdown.classList.remove("show");
+  dd.classList.add("show"); activeDropdown = dd;
+  if (doFocus) { input.focus(); input.select(); }
+}
 
-      const maxCols = Math.max(0, ...tableData.map(r => (r ? r.length : 0)));
-      const rowsToShow = Math.min(displayedRows, tableData.length);
-
-      let html = "<thead><tr>";
-      for (let i = 0; i < maxCols; i++) {
-        const isSelected = selectedColumns.has(i);
-        const customName = selectedColumns.get(i);
-        html += `<th class="${isSelected ? "selected" : ""}" data-col="${i}">`;
-        if (isSelected) html += createRenameInput(i, customName);
-        else html += escapeHtml(String(i + 1));
-        html += "</th>";
-      }
-      html += "</tr></thead><tbody>";
-
-      for (let rowIndex = 0; rowIndex < rowsToShow; rowIndex++) {
-        const row = tableData[rowIndex] || [];
-        const isHidden = rowIndex < startRowIndex;
-        html += `<tr class="${isHidden ? "row-hidden" : ""}" data-row-index="${rowIndex}">`;
-        for (let i = 0; i < maxCols; i++) {
-          const cellValue = (row[i] !== undefined && row[i] !== null) ? row[i] : "";
-          html += `<td data-row="${rowIndex}" data-col="${i}">${escapeHtml(cellValue)}</td>`;
-        }
-        html += "</tr>";
-      }
-      html += "</tbody>";
-
-      dataTable.innerHTML = html;
-      attachEventListeners();
-      updateStats();
-    }
-
-    function createRenameInput(colIndex, value) {
-      const escapedValue = String(value || "").replaceAll('"', "&quot;");
-      const itemsHtml = columnTemplates
-        .filter(Boolean)
-        .map(t => {
-          const safeText = escapeHtml(t);
-          const safeAttr = String(t).replaceAll('"', "&quot;");
-          return `<div class="dropdown-item" data-value="${safeAttr}">${safeText}</div>`;
-        })
-        .join("");
-
-      return `
-        <div class="rename-wrapper" data-col="${colIndex}">
-          <input type="text" class="rename-input" value="${escapedValue}" data-col="${colIndex}" placeholder="Название"/>
-          <div class="dropdown" data-col="${colIndex}">${itemsHtml}</div>
-        </div>
-      `;
-    }
-
-    function openDropdownForColumn(colIndex, focus = true) {
-      const input = document.querySelector(`.rename-input[data-col="${colIndex}"]`);
-      const dropdown = document.querySelector(`.dropdown[data-col="${colIndex}"]`);
-      if (!input || !dropdown) return;
-
-      if (activeDropdown && activeDropdown !== dropdown) activeDropdown.classList.remove("show");
-      dropdown.classList.add("show");
-      activeDropdown = dropdown;
-
-      if (focus) {
-        input.focus();
-        input.select();
-      }
-    }
-
-    function attachEventListeners() {
-      // Header click: select/unselect (ignore input clicks)
-      document.querySelectorAll("th").forEach(th => {
-        th.addEventListener("click", function(e) {
-          if (e.target.closest(".rename-wrapper")) return;
-          const colIndex = parseInt(th.dataset.col, 10);
-
-          const wasSelected = selectedColumns.has(colIndex);
-          if (wasSelected) {
-            selectedColumns.delete(colIndex);
-            renderTable();
-            return;
-          }
-
-          selectedColumns.set(colIndex, "");
-          renderTable();
-          requestAnimationFrame(() => openDropdownForColumn(colIndex, true));
-        });
-      });
-
-      // Input events
-      document.querySelectorAll(".rename-input").forEach(input => {
-        input.addEventListener("click", function(e) {
-          e.stopPropagation();
-          openDropdownForColumn(parseInt(e.target.dataset.col, 10), false);
-        });
-        input.addEventListener("input", function(e) {
-          const colIndex = parseInt(e.target.dataset.col, 10);
-          selectedColumns.set(colIndex, e.target.value);
-          updateStats();
-        });
-        input.addEventListener("focus", function(e) {
-          e.target.select();
-        });
-      });
-
-      // Dropdown pick
-      document.querySelectorAll(".dropdown-item").forEach(item => {
-        item.addEventListener("click", function(e) {
-          e.stopPropagation();
-          const value = e.target.dataset.value || "";
-          const dropdown = e.target.closest(".dropdown");
-          const colIndex = parseInt(dropdown.dataset.col, 10);
-          const input = document.querySelector(`.rename-input[data-col="${colIndex}"]`);
-          if (!input) return;
-
-          input.value = value;
-          selectedColumns.set(colIndex, value);
-
-          dropdown.classList.remove("show");
-          activeDropdown = null;
-
-          updateStats();
-        });
-      });
-
-      // Row click: hide all rows above
-      document.querySelectorAll("td").forEach(td => {
-        td.addEventListener("click", function() {
-          startRowIndex = parseInt(td.dataset.row, 10) || 0;
-          renderTable();
-        });
-      });
-    }
-
-    function updateLoadMoreButton() {
-      const remaining = (tableData ? tableData.length : 0) - displayedRows;
-      if (remaining > 0) {
-        loadMoreContainer.style.display = "block";
-        document.getElementById("remainingRows").textContent = String(remaining);
-      } else {
-        loadMoreContainer.style.display = "none";
-      }
-    }
-
-    loadMoreBtn.addEventListener("click", function() {
-      displayedRows = tableData ? tableData.length : displayedRows;
-      renderTable();
-      updateLoadMoreButton();
+function attachEvents() {
+  document.querySelectorAll("th[data-col]").forEach(th => {
+    th.addEventListener("click", function(e) {
+      if (e.target.closest(".rename-wrapper")) return;
+      const ci = parseInt(th.dataset.col, 10);
+      if (selectedColumns.has(ci)) { selectedColumns.delete(ci); renderTable(); return; }
+      selectedColumns.set(ci, ""); renderTable();
+      requestAnimationFrame(() => openDropdown(ci, true));
     });
-
-    function updateStats() {
-      const maxCols = tableData && tableData.length > 0
-        ? Math.max(0, ...tableData.map(r => (r ? r.length : 0)))
-        : 0;
-
-      document.getElementById("totalColumns").textContent = String(maxCols);
-      document.getElementById("selectedColumns").textContent = String(selectedColumns.size);
-      document.getElementById("totalRows").textContent = String(Math.max(0, (tableData ? tableData.length : 0) - startRowIndex));
-
-      downloadBtn.disabled = selectedColumns.size === 0;
-    }
-
-    // --- CSV helpers ---
-    function escapeCSV(value) {
-      if (value === null || value === undefined) return "";
-      const s = String(value);
-      if (s.includes('"') || s.includes(",") || s.includes("\n") || s.includes("\r")) {
-        return `"${s.replaceAll('"', '""')}"`;
-      }
-      return s;
-    }
-
-    function normalizeHeaderName(name) {
-      return String(name || "")
-        .toLowerCase()
-        .trim()
-        .replaceAll("ё", "е")
-        .replaceAll(/\s+/g, " ")
-        .replaceAll(/[^\p{L}\p{N} ]/gu, ""); // убираем пунктуацию (unicode)
-    }
-
-    // ВАЖНО: теперь удаляем точку(и) в конце, чтобы "460...8." стало валидным.
-    function normalizeBarcode(raw) {
-      let s = String(raw ?? "").trim();
-      if (!s) return "";
-
-      // убираем пробелы/табуляции внутри
-      s = s.replace(/\s+/g, "");
-
-      // NEW: убираем одну или несколько точек на конце
-      while (s.endsWith(".")) s = s.slice(0, -1);
-
-      // чисто цифровой
-      if (/^\d+$/.test(s)) return s;
-
-      // частый excel-случай "12345.0"
-      if (/^\d+\.0$/.test(s)) return s.split(".0")[0];
-
-      // допустим "1,23E12" или "1.23e+12"
-      const normalized = s.replace(",", ".");
-      const m = normalized.match(/^(\d+)(?:\.(\d+))?e\+?(\d+)$/i);
-      if (!m) return "";
-
-      const intPart = m[1];
-      const fracPart = m[2] || "";
-      const exp = parseInt(m[3], 10);
-
-      const digits = intPart + fracPart;               // все цифры без точки
-      const shift = exp - fracPart.length;             // сколько нулей надо добавить справа (если >=0)
-
-      if (shift >= 0) {
-        return digits + "0".repeat(shift);
-      }
-
-      // Если shift < 0 — число было нецелым после развёртки. Разрешаем только если "хвост" — нули.
-      const cut = digits.length + shift;               // shift отрицательный
-      if (cut <= 0) return "";
-
-      const tail = digits.slice(cut);
-      if (!/^0+$/.test(tail)) return "";
-
-      return digits.slice(0, cut);
-    }
-
-    function findBarcodeColumnIndex(selectedIndices) {
-      for (const colIndex of selectedIndices) {
-        const userName = selectedColumns.get(colIndex) || "";
-        const n = normalizeHeaderName(userName);
-
-        if (!n) continue;
-        if (/штрихкод/.test(n) || /barcode/.test(n) || /\bean\b/.test(n) || /ean13/.test(n) || /ean 13/.test(n)) {
-          return colIndex;
-        }
-      }
-      return -1;
-    }
-
-    function buildCsvAndSkipped() {
-      if (selectedColumns.size === 0) return { ok: false, error: "Выберите колонки." };
-
-      const selectedIndices = Array.from(selectedColumns.keys()).sort((a,b) => a - b);
-
-      const barcodeColIndex = findBarcodeColumnIndex(selectedIndices);
-      if (barcodeColIndex === -1) {
-        return { ok: false, error: "Не найдена колонка штрихкода среди выбранных (название должно содержать «штрихкод»/barcode/ean)." };
-      }
-
-      // BOM для Excel + UTF-8
-      let csvContent = "\uFEFF";
-
-      // Header row
-      csvContent += selectedIndices.map(i => escapeCSV(selectedColumns.get(i) || "")).join(",") + "\n";
-
-      const skipped = [];
-
-      for (let rowIndex = startRowIndex; rowIndex < tableData.length; rowIndex++) {
-        const row = tableData[rowIndex] || [];
-
-        const rawBarcode = row[barcodeColIndex];
-        const rawBarcodeStr = (rawBarcode === undefined || rawBarcode === null) ? "" : String(rawBarcode);
-
-        const normalizedBarcode = normalizeBarcode(rawBarcode);
-
-        if (!normalizedBarcode || !/^\d+$/.test(normalizedBarcode)) {
-          const isEmpty = !rawBarcodeStr.trim();
-          skipped.push({
-            rowIndex,
-            rowNumber: rowIndex + 1, // как в Excel
-            rawBarcode: rawBarcodeStr,
-            normalizedBarcode: normalizedBarcode || "",
-            reason: isEmpty ? "Пустой штрихкод" : "Некорректный штрихкод"
-          });
-          continue;
-        }
-
-        const values = selectedIndices.map(colIndex => {
-          if (colIndex === barcodeColIndex) return normalizedBarcode;
-
-          let value = (row[colIndex] !== undefined && row[colIndex] !== null) ? row[colIndex] : "";
-          value = String(value).trim();
-
-          // "1349,00" -> "1349.00"
-          if (/^\d+,\d{2}$/.test(value)) value = value.replace(",", ".");
-
-          return value;
-        });
-
-        // пропускаем полностью пустые строки (после старта)
-        if (values.every(v => !String(v).trim())) continue;
-
-        csvContent += values.map(v => escapeCSV(v)).join(",") + "\n";
-      }
-
-      return { ok: true, csvContent, skipped, skippedCount: skipped.length };
-    }
-
-    // --- Saving helpers ---
-    function _pickerTypes(filename) {
-      const n = String(filename).toLowerCase();
-      if (n.endsWith(".html") || n.endsWith(".htm"))
-        return [{ description: "HTML-файл", accept: { "text/html": [".html"] } }];
-      if (n.endsWith(".csv"))
-        return [{ description: "CSV-файл", accept: { "text/csv": [".csv"] } }];
-      return [{ description: "Текстовый файл", accept: { "text/plain": [".txt"] } }];
-    }
-
-    async function saveTextFile(filename, text, mime) {
-      if ("showSaveFilePicker" in window) {
-        try {
-          const pickerOpts = {
-            suggestedName: filename,
-            types: _pickerTypes(filename)
-          };
-          // First save → Desktop; subsequent → last chosen folder
-          pickerOpts.startIn = lastSaveHandle ? lastSaveHandle : "desktop";
-
-          const handle = await window.showSaveFilePicker(pickerOpts);
-          // Remember this handle so next save opens the same folder
-          lastSaveHandle = handle;
-
-          const writable = await handle.createWritable();
-          await writable.write(new Blob([text], { type: mime || "text/plain;charset=utf-8" }));
-          await writable.close();
-          return true;
-        } catch (e) {
-          return false;
-        }
-      }
-      const blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.href = url; link.download = filename;
-      document.body.appendChild(link); link.click();
-      document.body.removeChild(link); URL.revokeObjectURL(url);
-      return true;
-    }
-
-    function downloadTextFile(filename, text, mime) { saveTextFile(filename, text, mime); }
-
-    // --- Skipped modal ---
-    function openSkippedModal(skipped, fileName) {
-      pendingSkippedRows = skipped.slice();
-      pendingCsvFileName = fileName || (originalFileName + ".csv");
-
-      // NEW: в превью-окне НЕ показываем строки с причиной "Пустой штрихкод"
-      const filteredForPreview = skipped.filter(s => s.reason !== "Пустой штрихкод");
-
-      const hiddenCount = skipped.length - filteredForPreview.length;
-      const maxShow = 500;
-      const toShow = filteredForPreview.slice(0, maxShow);
-
-      skippedSummary.textContent =
-        `Всего пропусков: ${skipped.length}. Скрыто пустых: ${hiddenCount}. Показано: ${toShow.length}` +
-        (filteredForPreview.length > maxShow ? ` (из ${filteredForPreview.length})` : "") + ".";
-
-      let html = "<thead><tr>" +
-        '<th style="min-width:90px;">Строка</th>' +
-        '<th style="min-width:240px;">Штрихкод (как в файле)</th>' +
-        '<th style="min-width:240px;">Нормализованный</th>' +
-        '<th style="min-width:260px;">Причина</th>' +
-        "</tr></thead><tbody>";
-
-      toShow.forEach(s => {
-        html += "<tr>" +
-          `<td>${escapeHtml(s.rowNumber)}</td>` +
-          `<td>${escapeHtml(s.rawBarcode)}</td>` +
-          `<td>${escapeHtml(s.normalizedBarcode)}</td>` +
-          `<td>${escapeHtml(s.reason)}</td>` +
-          "</tr>";
-      });
-
-      html += "</tbody>";
-      skippedTable.innerHTML = html;
-
-      skippedModal.style.display = "flex";
-    }
-
-    function hideSkippedModal() { skippedModal.style.display = "none"; }
-
-    closeSkippedModal.addEventListener("click", hideSkippedModal);
-    skippedModal.addEventListener("click", function(e) {
-      if (e.target === skippedModal) hideSkippedModal();
-    });
-
-    confirmDownloadCsvBtn.addEventListener("click", async function() {
-      if (!pendingCsvContent) return;
-      const saved = await saveTextFile(pendingCsvFileName || (originalFileName + ".csv"), pendingCsvContent, "text/csv;charset=utf-8");
-      hideSkippedModal();
-      if (saved && fileQueue.length > 0) {
-        setTimeout(() => loadNextFromQueue(), 300);
-      }
-    });
-
-    downloadSkippedBtn.addEventListener("click", async function() {
-      if (!pendingSkippedRows || pendingSkippedRows.length === 0) {
-        alert("Нет пропусков.");
-        return;
-      }
-
-      let content = "rowNumber,rawBarcode,normalizedBarcode,reason\n";
-      pendingSkippedRows.forEach(s => {
-        const row = [s.rowNumber, s.rawBarcode, s.normalizedBarcode, s.reason].map(escapeCSV).join(",");
-        content += row + "\n";
-      });
-
-      await saveTextFile(originalFileName + "_skipped-rows.csv", content, "text/csv;charset=utf-8");
-    });
-
-    // --- Main actions ---
-    downloadBtn.addEventListener("click", async function() {
-      const res = buildCsvAndSkipped();
-      if (!res.ok) { alert(res.error); return; }
-
-      pendingCsvContent = res.csvContent;
-
-      // NEW: модалку показываем только если есть пропуски НЕ из-за пустого штрихкода
-      const skippedForPreview = res.skipped.filter(s => s.reason !== "Пустой штрихкод");
-      if (skippedForPreview.length > 0) {
-        openSkippedModal(res.skipped, originalFileName + ".csv");
-        return;
-      }
-
-      const saved = await saveTextFile(originalFileName + ".csv", res.csvContent, "text/csv;charset=utf-8");
-      if (saved && fileQueue.length > 0) {
-        setTimeout(() => loadNextFromQueue(), 300);
-      }
-    });
-
-    resetBtn.addEventListener("click", function() {
-      selectedColumns.clear();
-      startRowIndex = 0;
-      renderTable();
-    });
-
-    // --- Templates modal ---
-    function renderSynonymsPanel(panel, tplName) {
-      panel.innerHTML = "";
-      const synonyms = columnSynonyms[tplName] || [];
-      const lbl = document.createElement("div"); lbl.className = "synonyms-label";
-      lbl.textContent = "Синонимы (точное совпадение, без учёта регистра):"; panel.appendChild(lbl);
-      const chipsRow = document.createElement("div"); chipsRow.className = "synonyms-chips";
-      synonyms.forEach((syn, i) => {
-        const chip = document.createElement("div"); chip.className = "synonym-chip";
-        const sinput = document.createElement("input"); sinput.type="text"; sinput.value=syn;
-        sinput.className="synonym-input"; sinput.title="Редактировать синоним";
-        sinput.addEventListener("change", function() {
-          if (!columnSynonyms[tplName]) columnSynonyms[tplName]=[];
-          columnSynonyms[tplName][i]=sinput.value.trim(); persistAll();
-        });
-        const rb = document.createElement("button"); rb.className="synonym-remove"; rb.textContent="×"; rb.title="Удалить";
-        rb.addEventListener("click", function() {
-          if (!columnSynonyms[tplName]) return;
-          columnSynonyms[tplName].splice(i,1); persistAll(); renderSynonymsPanel(panel,tplName);
-        });
-        chip.appendChild(sinput); chip.appendChild(rb); chipsRow.appendChild(chip);
-      });
-      panel.appendChild(chipsRow);
-      const addRow = document.createElement("div"); addRow.className="synonym-add-row";
-      const addInput = document.createElement("input"); addInput.type="text";
-      addInput.placeholder="Новый синоним…"; addInput.className="synonym-new-input";
-      const addBtn = document.createElement("button"); addBtn.className="btn-primary";
-      addBtn.style.cssText="font-size:12px;padding:5px 10px"; addBtn.textContent="+ Добавить";
-      addBtn.addEventListener("click", function() {
-        const val = addInput.value.trim(); if (!val) return;
-        if (!columnSynonyms[tplName]) columnSynonyms[tplName]=[];
-        columnSynonyms[tplName].push(val); persistAll(); addInput.value=""; renderSynonymsPanel(panel,tplName);
-      });
-      addInput.addEventListener("keydown", e => { if (e.key==="Enter") addBtn.click(); });
-      addRow.appendChild(addInput); addRow.appendChild(addBtn); panel.appendChild(addRow);
-    }
-
-    function renderTemplatesList() {
-      templatesList.innerHTML = "";
-      const total = columnTemplates.length;
-      columnTemplates.forEach((t, idx) => {
-        const block = document.createElement("div"); block.className="template-block";
-        const row = document.createElement("div"); row.className="template-row";
-        const upBtn = document.createElement("button"); upBtn.className="btn-secondary btn-icon";
-        upBtn.textContent="↑"; upBtn.title="Переместить вверх"; upBtn.disabled = idx===0;
-        upBtn.addEventListener("click", function() {
-          if (idx===0) return;
-          [columnTemplates[idx-1],columnTemplates[idx]]=[columnTemplates[idx],columnTemplates[idx-1]];
-          persistAll(); renderTemplatesList(); renderTable();
-        });
-        const downBtn = document.createElement("button"); downBtn.className="btn-secondary btn-icon";
-        downBtn.textContent="↓"; downBtn.title="Переместить вниз"; downBtn.disabled = idx===total-1;
-        downBtn.addEventListener("click", function() {
-          if (idx===total-1) return;
-          [columnTemplates[idx],columnTemplates[idx+1]]=[columnTemplates[idx+1],columnTemplates[idx]];
-          persistAll(); renderTemplatesList(); renderTable();
-        });
-        const input = document.createElement("input"); input.type="text"; input.value=t;
-        const capturedOld = t;
-        input.addEventListener("change", function() {
-          const newName = input.value.trim();
-          if (!newName || newName===capturedOld) return;
-          if (columnSynonyms[capturedOld]!==undefined) { columnSynonyms[newName]=columnSynonyms[capturedOld]; delete columnSynonyms[capturedOld]; }
-          columnTemplates[idx]=newName; persistAll(); renderTemplatesList(); renderTable();
-        });
-        const synToggle = document.createElement("button"); synToggle.className="btn-secondary syn-toggle-btn";
-        synToggle.textContent="🔤 Синонимы"; synToggle.title="Показать / скрыть синонимы";
-        synToggle.addEventListener("click", function() {
-          const p = block.querySelector(".synonyms-panel");
-          if (!p) return;
-          const shown = p.style.display!=="none";
-          p.style.display = shown ? "none" : "block";
-          synToggle.textContent = shown ? "🔤 Синонимы" : "🔤 Синонимы ▲";
-        });
-        const delBtn = document.createElement("button"); delBtn.className="btn-secondary"; delBtn.textContent="Удалить";
-        delBtn.addEventListener("click", function() {
-          columnTemplates.splice(idx,1); persistAll(); renderTemplatesList(); renderTable();
-        });
-        row.appendChild(upBtn); row.appendChild(downBtn); row.appendChild(input);
-        row.appendChild(synToggle); row.appendChild(delBtn); block.appendChild(row);
-        const synPanel = document.createElement("div"); synPanel.className="synonyms-panel"; synPanel.style.display="none";
-        renderSynonymsPanel(synPanel, t); block.appendChild(synPanel);
-        templatesList.appendChild(block);
-      });
-    }
-    function openTemplatesModal() {
-      renderTemplatesList();
-      templatesModal.style.display = "flex";
-      newTemplateInput.value = "";
-      newTemplateInput.focus();
-    }
-    function hideTemplatesModal() { templatesModal.style.display = "none"; }
-
-    manageTemplatesBtn.addEventListener("click", function(e) {
+  });
+  document.querySelectorAll(".rename-input").forEach(inp => {
+    inp.addEventListener("click", e => { e.stopPropagation(); openDropdown(parseInt(inp.dataset.col,10), false); });
+    inp.addEventListener("input", e => { selectedColumns.set(parseInt(inp.dataset.col,10), inp.value); updateStats(); });
+    inp.addEventListener("focus", e => e.target.select());
+  });
+  document.querySelectorAll(".dropdown-item").forEach(item => {
+    item.addEventListener("click", e => {
       e.stopPropagation();
-      openTemplatesModal();
+      const dd = e.target.closest(".dropdown");
+      const ci = parseInt(dd.dataset.col, 10);
+      const inp = document.querySelector(`.rename-input[data-col="${ci}"]`);
+      if (!inp) return;
+      inp.value = e.target.dataset.value || "";
+      selectedColumns.set(ci, inp.value);
+      dd.classList.remove("show"); activeDropdown = null; updateStats();
     });
-    closeTemplatesModal.addEventListener("click", hideTemplatesModal);
-    templatesModal.addEventListener("click", function(e) {
-      if (e.target === templatesModal) hideTemplatesModal();
+  });
+  // row click removed
+}
+
+function updateLoadMore() {
+  const rem = (tableData ? tableData.length : 0) - displayedRows;
+  loadMoreContainer.style.display = rem > 0 ? "block" : "none";
+  if (rem > 0) document.getElementById("remainingRows").textContent = String(rem);
+}
+
+loadMoreBtn.addEventListener("click", function() {
+  displayedRows = tableData ? tableData.length : displayedRows;
+  renderTable(); updateLoadMore();
+});
+
+function updateStats() {
+  const maxCols = tableData && tableData.length ? Math.max(0, ...tableData.map(r => r ? r.length : 0)) : 0;
+  document.getElementById("totalColumns").textContent  = String(maxCols);
+  document.getElementById("selectedColumns").textContent = String(selectedColumns.size);
+  document.getElementById("totalRows").textContent = String(Math.max(0, (tableData ? tableData.length : 0) - startRowIndex));
+  downloadBtn.disabled = selectedColumns.size === 0;
+}
+
+// ===== CSV =====
+function esc_csv(v) {
+  if (v == null) return "";
+  const s = String(v);
+  if (s.includes('"') || s.includes(",") || s.includes("\n") || s.includes("\r"))
+    return `"${s.replaceAll('"', '""')}"`;
+  return s;
+}
+function normHeader(n) {
+  return String(n||"").toLowerCase().trim().replaceAll("ё","е").replaceAll(/\s+/g," ").replaceAll(/[^\p{L}\p{N} ]/gu,"");
+}
+function normalizeBarcode(raw) {
+  let s = String(raw ?? "").trim().replace(/\s+/g, "");
+  while (s.endsWith(".")) s = s.slice(0,-1);
+  if (/^\d+$/.test(s)) return s;
+  if (/^\d+\.0$/.test(s)) return s.split(".0")[0];
+  const m = s.replace(",",".").match(/^(\d+)(?:\.(\d+))?e\+?(\d+)$/i);
+  if (!m) return "";
+  const digits = m[1]+(m[2]||""), exp = parseInt(m[3],10), shift = exp-(m[2]||"").length;
+  if (shift >= 0) return digits + "0".repeat(shift);
+  const cut = digits.length + shift;
+  if (cut <= 0 || !/^0+$/.test(digits.slice(cut))) return "";
+  return digits.slice(0, cut);
+}
+function findBarcodeCol(indices) {
+  for (const ci of indices) {
+    const n = normHeader(selectedColumns.get(ci)||"");
+    if (/штрихкод/.test(n) || /barcode/.test(n) || /\bean\b/.test(n)) return ci;
+  }
+  return -1;
+}
+
+function buildCsvAndSkipped() {
+  if (!selectedColumns.size) return { ok: false, error: "Выберите колонки." };
+  const indices = Array.from(selectedColumns.keys()).sort((a,b)=>a-b);
+  const bcCol = findBarcodeCol(indices);
+  if (bcCol === -1) return { ok: false, error: "Не найдена колонка штрихкода (название должно содержать «штрихкод» / barcode / ean)." };
+
+  let csv = "\uFEFF" + indices.map(i => esc_csv(selectedColumns.get(i)||"")).join(",") + "\n";
+  const skipped = [];
+
+  for (let ri = startRowIndex; ri < tableData.length; ri++) {
+    const row = tableData[ri] || [];
+    const rawBC = row[bcCol];
+    const rawBCS = rawBC == null ? "" : String(rawBC);
+    const normBC = normalizeBarcode(rawBC);
+    if (!normBC || !/^\d+$/.test(normBC)) {
+      skipped.push({ rowIndex: ri, rowNumber: ri+1, rawBarcode: rawBCS, normalizedBarcode: normBC||"", reason: !rawBCS.trim() ? "Пустой штрихкод" : "Некорректный штрихкод" });
+      continue;
+    }
+    const vals = indices.map(ci => {
+      if (ci === bcCol) return normBC;
+      let v = row[ci] != null ? String(row[ci]).trim() : "";
+      if (/^\d+,\d{2}$/.test(v)) v = v.replace(",", ".");
+      return v;
+    });
+    if (vals.every(v => !v)) continue;
+    csv += vals.map(esc_csv).join(",") + "\n";
+  }
+  return { ok: true, csvContent: csv, skipped };
+}
+
+// ===== SAVE =====
+function _pickerTypes(fn) {
+  const n = fn.toLowerCase();
+  if (n.endsWith(".html") || n.endsWith(".htm")) return [{ description: "HTML-файл", accept: { "text/html": [".html"] } }];
+  if (n.endsWith(".csv")) return [{ description: "CSV-файл", accept: { "text/csv": [".csv"] } }];
+  return [{ description: "Текстовый файл", accept: { "text/plain": [".txt"] } }];
+}
+async function saveTextFile(filename, text, mime) {
+  if ("showSaveFilePicker" in window) {
+    try {
+      const handle = await window.showSaveFilePicker({ suggestedName: filename, types: _pickerTypes(filename), startIn: lastSaveHandle || "desktop" });
+      lastSaveHandle = handle;
+      const w = await handle.createWritable();
+      await w.write(new Blob([text], { type: mime || "text/plain;charset=utf-8" }));
+      await w.close();
+      return true;
+    } catch { return false; }
+  }
+  const blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  return true;
+}
+
+// ===== SKIPPED MODAL =====
+function openSkippedModal(skipped, fn) {
+  pendingSkippedRows = skipped.slice();
+  pendingCsvFileName = fn;
+  const preview = skipped.filter(s => s.reason !== "Пустой штрихкод");
+  const hidden = skipped.length - preview.length;
+  const toShow = preview.slice(0, 500);
+  skippedSummary.textContent = `Всего пропусков: ${skipped.length}. Пустых скрыто: ${hidden}. Показано: ${toShow.length}${preview.length>500?" (из "+preview.length+")":""}.`;
+  let h = "<thead><tr><th style='min-width:80px'>Строка</th><th style='min-width:220px'>Штрихкод в файле</th><th style='min-width:220px'>Нормализованный</th><th style='min-width:220px'>Причина</th></tr></thead><tbody>";
+  toShow.forEach(s => { h += `<tr><td>${esc(s.rowNumber)}</td><td>${esc(s.rawBarcode)}</td><td>${esc(s.normalizedBarcode)}</td><td>${esc(s.reason)}</td></tr>`; });
+  h += "</tbody>";
+  skippedTable.innerHTML = h;
+  skippedModal.style.display = "flex";
+}
+function hideSkippedModal() { skippedModal.style.display = "none"; }
+closeSkippedModal.addEventListener("click", hideSkippedModal);
+skippedModal.addEventListener("click", e => { if (e.target === skippedModal) hideSkippedModal(); });
+
+confirmDownloadCsvBtn.addEventListener("click", async function() {
+  if (!pendingCsvContent) return;
+  const saved = await saveTextFile(pendingCsvFileName || originalFileName+".csv", pendingCsvContent, "text/csv;charset=utf-8");
+  hideSkippedModal();
+  if (saved && fileQueue.length) setTimeout(loadNextFromQueue, 300);
+});
+downloadSkippedBtn.addEventListener("click", function() {
+  if (!pendingSkippedRows || !pendingSkippedRows.length) { alert("Нет пропусков."); return; }
+  // Show full list (including empty barcodes) in expanded table
+  const allRows = pendingSkippedRows;
+  let h = "<thead><tr><th style='min-width:80px'>Строка</th><th style='min-width:220px'>Штрихкод в файле</th><th style='min-width:220px'>Нормализованный</th><th style='min-width:220px'>Причина</th></tr></thead><tbody>";
+  allRows.forEach(s => { h += `<tr><td>${esc(s.rowNumber)}</td><td>${esc(s.rawBarcode)}</td><td>${esc(s.normalizedBarcode)}</td><td>${esc(s.reason)}</td></tr>`; });
+  h += "</tbody>";
+  skippedTable.innerHTML = h;
+  skippedSummary.textContent = `Показаны все пропуски: ${allRows.length}`;
+});
+
+// ===== DOWNLOAD CSV =====
+downloadBtn.addEventListener("click", async function() {
+  const res = buildCsvAndSkipped();
+  if (!res.ok) { alert(res.error); return; }
+  pendingCsvContent = res.csvContent;
+  const preview = res.skipped.filter(s => s.reason !== "Пустой штрихкод");
+  if (preview.length) { openSkippedModal(res.skipped, originalFileName+".csv"); return; }
+  const saved = await saveTextFile(originalFileName+".csv", res.csvContent, "text/csv;charset=utf-8");
+  if (saved && fileQueue.length) setTimeout(loadNextFromQueue, 300);
+});
+
+// ===== RESET =====
+resetBtn.addEventListener("click", function() {
+  selectedColumns.clear(); startRowIndex = 0; renderTable();
+});
+
+// ===== TEMPLATES MODAL =====
+function renderSynPanel(panel, tplName) {
+  panel.innerHTML = "";
+  const syns = columnSynonyms[tplName] || [];
+  const lbl = document.createElement("div"); lbl.className = "syn-label";
+  lbl.textContent = "Синонимы для автораспознавания:"; panel.appendChild(lbl);
+  const chips = document.createElement("div"); chips.className = "syn-chips";
+  syns.forEach((s, i) => {
+    const chip = document.createElement("div"); chip.className = "syn-chip";
+    const inp = document.createElement("input"); inp.className = "syn-input"; inp.type = "text"; inp.value = s;
+    inp.addEventListener("change", () => { columnSynonyms[tplName][i] = inp.value.trim(); persistAll(); });
+    const rm = document.createElement("button"); rm.className = "syn-remove"; rm.textContent = "×";
+    rm.addEventListener("click", () => { columnSynonyms[tplName].splice(i,1); persistAll(); renderSynPanel(panel,tplName); });
+    chip.appendChild(inp); chip.appendChild(rm); chips.appendChild(chip);
+  });
+  panel.appendChild(chips);
+  const addRow = document.createElement("div"); addRow.className = "syn-add-row";
+  const addInp = document.createElement("input"); addInp.className = "syn-new-input"; addInp.type = "text"; addInp.placeholder = "Новый синоним…";
+  const addBtn = document.createElement("button"); addBtn.className = "btn btn-small btn-green"; addBtn.textContent = "+ Добавить";
+  addBtn.addEventListener("click", () => {
+    const v = addInp.value.trim(); if (!v) return;
+    if (!columnSynonyms[tplName]) columnSynonyms[tplName] = [];
+    columnSynonyms[tplName].push(v); persistAll(); addInp.value = ""; renderSynPanel(panel, tplName);
+  });
+  addInp.addEventListener("keydown", e => { if (e.key === "Enter") addBtn.click(); });
+  addRow.appendChild(addInp); addRow.appendChild(addBtn); panel.appendChild(addRow);
+}
+
+function renderTemplatesList() {
+  templatesList.innerHTML = "";
+  const total = columnTemplates.length;
+  columnTemplates.forEach((t, idx) => {
+    const block = document.createElement("div"); block.className = "tpl-block";
+    const row = document.createElement("div"); row.className = "tpl-row";
+
+    const upBtn = document.createElement("button"); upBtn.className = "btn btn-small"; upBtn.textContent = "↑"; upBtn.disabled = idx === 0;
+    upBtn.addEventListener("click", () => { if (!idx) return; [columnTemplates[idx-1],columnTemplates[idx]]=[columnTemplates[idx],columnTemplates[idx-1]]; persistAll(); renderTemplatesList(); renderTable(); });
+
+    const dnBtn = document.createElement("button"); dnBtn.className = "btn btn-small"; dnBtn.textContent = "↓"; dnBtn.disabled = idx === total-1;
+    dnBtn.addEventListener("click", () => { if (idx===total-1) return; [columnTemplates[idx],columnTemplates[idx+1]]=[columnTemplates[idx+1],columnTemplates[idx]]; persistAll(); renderTemplatesList(); renderTable(); });
+
+    const inp = document.createElement("input"); inp.type = "text"; inp.value = t;
+    const oldName = t;
+    inp.addEventListener("change", () => {
+      const n = inp.value.trim(); if (!n || n === oldName) return;
+      if (columnSynonyms[oldName] !== undefined) { columnSynonyms[n] = columnSynonyms[oldName]; delete columnSynonyms[oldName]; }
+      columnTemplates[idx] = n; persistAll(); renderTemplatesList(); renderTable();
     });
 
-    addTemplateBtn.addEventListener("click", function() {
-      const val = newTemplateInput.value.trim();
-      if (!val) return;
-      columnTemplates.push(val);
-      persistAll();
-      renderTemplatesList();
-      renderTable();
-      newTemplateInput.value = "";
-      newTemplateInput.focus();
-    });
-    newTemplateInput.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") addTemplateBtn.click();
+    const synBtn = document.createElement("button"); synBtn.className = "btn btn-small"; synBtn.textContent = "🔤 Синонимы";
+    synBtn.addEventListener("click", () => {
+      const p = block.querySelector(".syn-panel"); if (!p) return;
+      const vis = p.style.display !== "none";
+      p.style.display = vis ? "none" : "block";
+      synBtn.textContent = vis ? "🔤 Синонимы" : "🔤 Синонимы ▲";
     });
 
-    // --- Save app (export HTML without table data) ---
-    function buildExportHtml() {
-      persistColumnTemplates();
+    const delBtn = document.createElement("button"); delBtn.className = "btn btn-small"; delBtn.textContent = "Удалить";
+    delBtn.style.color = "#c00";
+    delBtn.addEventListener("click", () => { columnTemplates.splice(idx,1); persistAll(); renderTemplatesList(); renderTable(); });
 
-      const clone = document.documentElement.cloneNode(true);
+    row.appendChild(upBtn); row.appendChild(dnBtn); row.appendChild(inp);
+    row.appendChild(synBtn); row.appendChild(delBtn); block.appendChild(row);
 
-      // remove table data
-      const clonedTable = clone.querySelector("#dataTable");
-      if (clonedTable) clonedTable.innerHTML = "";
+    const synPanel = document.createElement("div"); synPanel.className = "syn-panel"; synPanel.style.display = "none";
+    renderSynPanel(synPanel, t); block.appendChild(synPanel);
+    templatesList.appendChild(block);
+  });
+}
 
-      const uploadScreenClone = clone.querySelector("#uploadScreen");
-      const tableContainerClone = clone.querySelector("#tableContainer");
-      if (uploadScreenClone) uploadScreenClone.style.display = "flex";
-      if (tableContainerClone) tableContainerClone.style.display = "none";
+manageTemplatesBtn.addEventListener("click", e => { e.stopPropagation(); renderTemplatesList(); templatesModal.style.display = "flex"; newTemplateInput.value = ""; newTemplateInput.focus(); });
+closeTemplatesModal.addEventListener("click", () => { templatesModal.style.display = "none"; });
+templatesModal.addEventListener("click", e => { if (e.target === templatesModal) templatesModal.style.display = "none"; });
 
-      const dl = clone.querySelector("#downloadBtn");
-      if (dl) dl.disabled = true;
+addTemplateBtn.addEventListener("click", () => {
+  const v = newTemplateInput.value.trim(); if (!v) return;
+  columnTemplates.push(v); persistAll(); renderTemplatesList(); renderTable();
+  newTemplateInput.value = ""; newTemplateInput.focus();
+});
+newTemplateInput.addEventListener("keydown", e => { if (e.key === "Enter") addTemplateBtn.click(); });
 
-      const loadMoreContainerClone = clone.querySelector("#loadMoreContainer");
-      if (loadMoreContainerClone) loadMoreContainerClone.style.display = "none";
+// ===== JS TOOLTIP ENGINE =====
+(function() {
+  const tip = document.getElementById('study-tooltip');
+  if (!tip) return;
+  let currentTarget = null;
 
-      const queuePanelClone = clone.querySelector("#queuePanel");
-      if (queuePanelClone) queuePanelClone.style.display = "none";
+  document.addEventListener('mouseover', function(e) {
+    if (!document.body.classList.contains('study-mode')) return;
+    const el = e.target.closest('[data-tip]');
+    if (!el || el === currentTarget) return;
+    currentTarget = el;
+    tip.textContent = el.getAttribute('data-tip');
+    tip.style.display = 'block';
+    positionTip(el);
+  });
 
-      ["totalColumns", "selectedColumns", "totalRows", "remainingRows"].forEach(id => {
-        const el = clone.querySelector("#" + id);
-        if (el) el.textContent = "0";
-      });
+  document.addEventListener('mouseout', function(e) {
+    const el = e.target.closest('[data-tip]');
+    if (!el) return;
+    const related = e.relatedTarget;
+    if (related && el.contains(related)) return;
+    tip.style.display = 'none';
+    currentTarget = null;
+  });
 
-      clone.querySelectorAll(".dropdown.show").forEach(d => d.classList.remove("show"));
+  document.addEventListener('mousemove', function(e) {
+    if (tip.style.display === 'none') return;
+    if (currentTarget) positionTip(currentTarget);
+  });
 
-      const modal1 = clone.querySelector("#templatesModal");
-      if (modal1) modal1.style.display = "none";
-      const modal2 = clone.querySelector("#skippedModal");
-      if (modal2) modal2.style.display = "none";
+  function positionTip(el) {
+    const rect = el.getBoundingClientRect();
+    const tw = 220, th = tip.offsetHeight || 60;
+    const margin = 8;
+    const vw = window.innerWidth, vh = window.innerHeight;
 
-      return "<!DOCTYPE html>\n" + clone.outerHTML;
+    // Try to place ABOVE the element
+    let top = rect.top - th - 10;
+    let left = rect.left + rect.width / 2 - tw / 2;
+
+    // If clipped at top — place BELOW
+    if (top < margin) {
+      top = rect.bottom + 10;
+      tip.style.setProperty('--arrow', 'top');
+    } else {
+      tip.style.setProperty('--arrow', 'bottom');
     }
 
-    saveAppBtn.addEventListener("click", async function() {
-      const html = buildExportHtml();
-      await saveTextFile("index.html", html, "text/html;charset=utf-8");
-    });
-  </script>
+    // Clamp horizontally
+    if (left < margin) left = margin;
+    if (left + tw > vw - margin) left = vw - tw - margin;
+
+    // Clamp vertically (if below also clipped)
+    if (top + th > vh - margin) top = vh - th - margin;
+
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.style.maxWidth = tw + 'px';
+  }
+})();
+
+function buildExportHtml() {
+  persistAll();
+  const clone = document.documentElement.cloneNode(true);
+  const t = clone.querySelector("#dataTable"); if (t) t.innerHTML = "";
+  const us = clone.querySelector("#uploadScreen"); if (us) us.style.display = "flex";
+  const tc = clone.querySelector("#tableContainer"); if (tc) tc.style.display = "none";
+  const db = clone.querySelector("#downloadBtn"); if (db) db.disabled = true;
+  const lm = clone.querySelector("#loadMoreContainer"); if (lm) lm.style.display = "none";
+  const qp = clone.querySelector("#queuePanel"); if (qp) qp.style.display = "none";
+  const qs = clone.querySelector("#queueStatus"); if (qs) qs.style.display = "none";
+  const body = clone.querySelector("body"); if (body) body.classList.remove("study-mode");
+  const sb = clone.querySelector("#studyModeBtn"); if (sb) { sb.classList.remove("study-active"); const sl = sb.querySelector("span:last-child"); if (sl) sl.textContent = "Справка"; }
+  ["totalColumns","selectedColumns","totalRows","remainingRows"].forEach(id => { const el = clone.querySelector("#"+id); if (el) el.textContent = "0"; });
+  clone.querySelectorAll(".dropdown.show").forEach(d => d.classList.remove("show"));
+  [clone.querySelector("#templatesModal"), clone.querySelector("#skippedModal")].forEach(m => { if (m) m.style.display = "none"; });
+  return "<!DOCTYPE html>\n" + clone.outerHTML;
+}
+
+saveAppBtn.addEventListener("click", async () => {
+  await saveTextFile("index.html", buildExportHtml(), "text/html;charset=utf-8");
+});
+</script>
+
 <script>
 (function(){
   const href = location.href;
   document.querySelectorAll('.global-nav__link').forEach(a => {
     const m = a.getAttribute('data-match') || '';
     if (m && href.includes(m)) a.classList.add('is-active');
-    // запасной вариант: если совпадает дом+путь целиком
     if (!m && href.startsWith(a.href)) a.classList.add('is-active');
   });
 })();
 </script>
-
-
-
-
-
 </body></html>
