@@ -24,7 +24,8 @@
       "штрихкод штука",
       "штрих-код",
       "штрихкод",
-      "штрихкод номенклатуры"
+      "штрихкод номенклатуры",
+      "штрих код"
     ],
     "Наименование": [
       "наименование товара",
@@ -458,8 +459,9 @@ tr:hover { background: #f8f6ff; }
   <div class="upload-screen" id="uploadScreen" style="display: flex;">
     <div class="upload-card">
       <h1>📊 Table to CSV</h1>
-      <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn">
-      <label for="fileInput" class="upload-btn">Загрузить файл</label>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn" multiple="">
+      <label for="fileInput" class="upload-btn">Загрузить файлы</label>
+      <div style="margin-top:10px;font-size:12px;color:#7c3aed;font-weight:600;">Можно выбрать несколько файлов — они обработаются по очереди</div>
     </div>
   </div>
 
@@ -472,7 +474,7 @@ tr:hover { background: #f8f6ff; }
       </div>
 
       <div class="file-input-wrapper">
-        <input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn">
+        <input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsb,.xlsm,.xml,.csv,.ods,.fods,.txt,.dbf,.dif,.sylk,.prn" multiple="">
         <label for="fileInput2" class="upload-btn" style="padding: 6px 14px; font-size: 13px;">Загрузить другой файл</label>
 
         <div class="sheet-selector" id="sheetSelector" style="display: none;">
@@ -483,6 +485,16 @@ tr:hover { background: #f8f6ff; }
 
     <div class="hint">
       <strong>Инструкция:</strong> После загрузки файла колонки определяются автоматически по ключевым словам в первых 15 строках. Клик по заголовку выбирает/снимает колонку → можно выбрать или ввести название вручную → клик по строке скрывает все строки выше.
+    </div>
+
+    <!-- Queue panel -->
+    <div id="queuePanel" style="display: none; margin-bottom: 12px; padding: 10px 14px; background: rgb(250, 245, 255); border: 1.5px solid rgb(196, 181, 253); border-radius: 12px; font-size: 12px; color: rgb(76, 29, 149);">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-weight:800;font-size:13px;">📋 Очередь:</span>
+        <span id="queueCurrent" style="background:#7c3aed;color:#fff;border-radius:8px;padding:3px 10px;font-weight:700;white-space:nowrap;">▶ Арс банк 17.02</span>
+        <span id="queueStatus" style="color:#7c3aed;font-weight:600;">Ожидают: 1 файл</span>
+      </div>
+      <div id="queueList" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;"><span style="background: rgb(237, 233, 254); border: 1px solid rgb(196, 181, 253); border-radius: 8px; padding: 3px 10px; color: rgb(109, 40, 217); font-weight: 600; white-space: nowrap;">1. Вост нал и банк 17.02.xls</span></div>
     </div>
 
     <div class="info-bar">
@@ -521,7 +533,7 @@ tr:hover { background: #f8f6ff; }
           <input id="newTemplateInput" type="text" placeholder="Добавить вариант (например: Штрихкод)">
           <button class="btn-primary" id="addTemplateBtn">Добавить</button>
         </div>
-        <div id="templatesList"><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх" disabled="">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз" disabled="">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div></div>
+        <div id="templatesList"><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх" disabled="">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы ▲</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: block;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div><div class="template-block"><div class="template-row"><button class="btn-secondary btn-icon" title="Переместить вверх">↑</button><button class="btn-secondary btn-icon" title="Переместить вниз" disabled="">↓</button><input type="text"><button class="btn-secondary syn-toggle-btn" title="Показать / скрыть синонимы">🔤 Синонимы</button><button class="btn-secondary">Удалить</button></div><div class="synonyms-panel" style="display: none;"><div class="synonyms-label">Синонимы (точное совпадение, без учёта регистра):</div><div class="synonyms-chips"><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div><div class="synonym-chip"><input type="text" class="synonym-input" title="Редактировать синоним"><button class="synonym-remove" title="Удалить">×</button></div></div><div class="synonym-add-row"><input type="text" placeholder="Новый синоним…" class="synonym-new-input"><button class="btn-primary" style="font-size: 12px; padding: 5px 10px;">+ Добавить</button></div></div></div></div>
         <div class="hint" style="margin-top: 10px;">
           Изменения попадут в выпадающий список и сохранятся в файл при нажатии «Сохранить».
         </div>
@@ -632,10 +644,16 @@ tr:hover { background: #f8f6ff; }
     let activeDropdown = null;
     let originalFileName = "export";
 
+    // Queue state
+    let fileQueue = []; // Array of File objects waiting to be processed
+
     // download-pending
     let pendingCsvContent = null;
     let pendingCsvFileName = null;
     let pendingSkippedRows = [];
+
+    // Remember last save location: first save opens Desktop, then reuses chosen folder
+    let lastSaveHandle = null;
 
     // --- DOM refs ---
     const uploadScreen = document.getElementById("uploadScreen");
@@ -679,14 +697,38 @@ tr:hover { background: #f8f6ff; }
       }
     });
 
-    // --- File load ---
-    fileInput.addEventListener("change", handleFileUpload);
-    fileInput2.addEventListener("change", handleFileUpload);
+    // --- Queue functions ---
+    function renderQueuePanel() {
+      const panel = document.getElementById("queuePanel");
+      const queueList = document.getElementById("queueList");
+      const queueCurrent = document.getElementById("queueCurrent");
+      const queueStatus = document.getElementById("queueStatus");
 
-    function handleFileUpload(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
+      if (fileQueue.length === 0) {
+        panel.style.display = "none";
+        return;
+      }
 
+      panel.style.display = "block";
+      queueCurrent.textContent = "▶ " + originalFileName;
+      queueStatus.textContent = "Ожидают: " + fileQueue.length + " " + declFiles(fileQueue.length);
+
+      queueList.innerHTML = "";
+      fileQueue.forEach((f, i) => {
+        const chip = document.createElement("span");
+        chip.style.cssText = "background:#ede9fe;border:1px solid #c4b5fd;border-radius:8px;padding:3px 10px;color:#6d28d9;font-weight:600;white-space:nowrap;";
+        chip.textContent = (i + 1) + ". " + f.name;
+        queueList.appendChild(chip);
+      });
+    }
+
+    function declFiles(n) {
+      if (n % 10 === 1 && n % 100 !== 11) return "файл";
+      if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return "файла";
+      return "файлов";
+    }
+
+    function loadFileObject(file) {
       originalFileName = (file.name || "export").replace(/\.[^.]+$/, "");
       if (fileNameDisplay) fileNameDisplay.textContent = "📂 " + (file.name || "");
 
@@ -712,12 +754,59 @@ tr:hover { background: #f8f6ff; }
           loadSheet(0);
           uploadScreen.style.display = "none";
           tableContainer.style.display = "block";
+          renderQueuePanel();
         } catch (err) {
           alert(err && err.message ? err.message : String(err));
           console.error(err);
+          // Try loading next on error
+          loadNextFromQueue();
         }
       };
       reader.readAsArrayBuffer(file);
+    }
+
+    function loadNextFromQueue() {
+      if (fileQueue.length === 0) {
+        // Queue exhausted - reset to upload screen after short delay
+        tableData = null;
+        selectedColumns.clear();
+        startRowIndex = 0;
+        currentWorkbook = null;
+        uploadScreen.style.display = "flex";
+        tableContainer.style.display = "none";
+        document.getElementById("queuePanel").style.display = "none";
+        return;
+      }
+
+      const nextFile = fileQueue.shift();
+      // Reset state for new file
+      selectedColumns.clear();
+      startRowIndex = 0;
+      displayedRows = 50;
+      loadFileObject(nextFile);
+    }
+
+    // --- File load ---
+    fileInput.addEventListener("change", handleFileUpload);
+    fileInput2.addEventListener("change", handleFileUpload);
+
+    function handleFileUpload(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      if (files.length === 1) {
+        // Single file - just load it, no queue change
+        fileQueue = [];
+        loadFileObject(files[0]);
+      } else {
+        // Multiple files - first goes to display, rest queue up
+        const arr = Array.from(files);
+        fileQueue = arr.slice(1);
+        loadFileObject(arr[0]);
+      }
+
+      // Reset the input so same files can be re-selected
+      event.target.value = "";
     }
 
     sheetSelect.addEventListener("change", function() {
@@ -1094,10 +1183,17 @@ tr:hover { background: #f8f6ff; }
     async function saveTextFile(filename, text, mime) {
       if ("showSaveFilePicker" in window) {
         try {
-          const handle = await window.showSaveFilePicker({
+          const pickerOpts = {
             suggestedName: filename,
             types: _pickerTypes(filename)
-          });
+          };
+          // First save → Desktop; subsequent → last chosen folder
+          pickerOpts.startIn = lastSaveHandle ? lastSaveHandle : "desktop";
+
+          const handle = await window.showSaveFilePicker(pickerOpts);
+          // Remember this handle so next save opens the same folder
+          lastSaveHandle = handle;
+
           const writable = await handle.createWritable();
           await writable.write(new Blob([text], { type: mime || "text/plain;charset=utf-8" }));
           await writable.close();
@@ -1164,8 +1260,11 @@ tr:hover { background: #f8f6ff; }
 
     confirmDownloadCsvBtn.addEventListener("click", async function() {
       if (!pendingCsvContent) return;
-      await saveTextFile(pendingCsvFileName || (originalFileName + ".csv"), pendingCsvContent, "text/csv;charset=utf-8");
+      const saved = await saveTextFile(pendingCsvFileName || (originalFileName + ".csv"), pendingCsvContent, "text/csv;charset=utf-8");
       hideSkippedModal();
+      if (saved && fileQueue.length > 0) {
+        setTimeout(() => loadNextFromQueue(), 300);
+      }
     });
 
     downloadSkippedBtn.addEventListener("click", async function() {
@@ -1197,7 +1296,10 @@ tr:hover { background: #f8f6ff; }
         return;
       }
 
-      await saveTextFile(originalFileName + ".csv", res.csvContent, "text/csv;charset=utf-8");
+      const saved = await saveTextFile(originalFileName + ".csv", res.csvContent, "text/csv;charset=utf-8");
+      if (saved && fileQueue.length > 0) {
+        setTimeout(() => loadNextFromQueue(), 300);
+      }
     });
 
     resetBtn.addEventListener("click", function() {
@@ -1343,6 +1445,9 @@ tr:hover { background: #f8f6ff; }
       const loadMoreContainerClone = clone.querySelector("#loadMoreContainer");
       if (loadMoreContainerClone) loadMoreContainerClone.style.display = "none";
 
+      const queuePanelClone = clone.querySelector("#queuePanel");
+      if (queuePanelClone) queuePanelClone.style.display = "none";
+
       ["totalColumns", "selectedColumns", "totalRows", "remainingRows"].forEach(id => {
         const el = clone.querySelector("#" + id);
         if (el) el.textContent = "0";
@@ -1374,6 +1479,7 @@ tr:hover { background: #f8f6ff; }
   });
 })();
 </script>
+
 
 
 
