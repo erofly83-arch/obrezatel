@@ -27,7 +27,7 @@
 
 /* ===== BODY ===== */
 body {
-  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 14px;
   background: #f0f0f0;
   min-height: 100vh;
@@ -35,34 +35,30 @@ body {
   color: #000;
 }
 
-/* ===== NAV — не трогаем ===== */
-.global-nav {
+/* ===== APP NAV ===== */
+.app-nav {
+  background: #14512e;
+  display: flex; align-items: stretch;
+  padding: 0 10px; gap: 2px; flex-shrink: 0;
+  border-bottom: 1px solid rgba(0,0,0,0.3);
   position: sticky; top: 0; z-index: 5000;
-  background: linear-gradient(90deg, #3b6fd4 0%, #6d28d9 60%, #9c1ac4 100%);
-  box-shadow: 0 4px 20px rgba(80,0,120,0.35);
 }
-.global-nav__inner {
-  max-width: 100%; margin: 0 auto; padding: 0 24px;
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 52px;
+.app-nav a {
+  color: rgba(255,255,255,0.55);
+  text-decoration: none; font-size: 13px; font-weight: 500;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  padding: 8px 18px; border-bottom: 3px solid transparent;
+  white-space: nowrap; letter-spacing: 0.01em;
+  transition: color .15s, background .15s;
+  display: flex; align-items: center;
 }
-.global-nav__brand {
-  text-decoration: none; font-weight: 800; font-size: 17px;
-  color: #fff; white-space: nowrap; letter-spacing: -0.3px; text-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-.global-nav__links { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.global-nav__link {
-  text-decoration: none; font-size: 13px; font-weight: 650;
-  color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.13);
-  border: 1px solid rgba(255,255,255,0.22); padding: 7px 14px;
-  border-radius: 999px; white-space: nowrap; transition: transform .12s, background .12s;
-}
-.global-nav__link:hover { transform: translateY(-1px); background: rgba(255,255,255,0.24); color: #fff; }
-.global-nav__link.is-active { color: #6d28d9; background: #fff; border-color: #fff; font-weight: 700; }
+.app-nav a:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.07); }
+.app-nav a.nav-active { color: #fff; border-bottom-color: #5dce8a; font-weight: 700; }
 
 /* ===== UPLOAD SCREEN ===== */
 .upload-screen {
   display: flex; align-items: center; justify-content: center;
-  min-height: calc(100vh - 52px); padding: 20px;
+  min-height: calc(100vh - 37px); padding: 20px;
   background: #f0f0f0;
 }
 .upload-card {
@@ -77,7 +73,7 @@ input[type="file"] { display: none; }
   display: inline-block; padding: 9px 22px;
   background: #217346; color: #fff; border-radius: 3px;
   cursor: pointer; font-size: 14px; font-weight: 600;
-  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   border: 1px solid #1a5c38; user-select: none; transition: background .12s;
 }
 .upload-btn:hover { background: #1a5c38; }
@@ -121,7 +117,7 @@ input[type="file"] { display: none; }
   gap: 2px; padding: 4px 8px; min-width: 52px;
   background: transparent; border: 1px solid transparent;
   border-radius: 2px; cursor: pointer;
-  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 11px; color: #1f1f1f; font-weight: 400;
   transition: background .1s, border-color .1s; white-space: nowrap;
 }
@@ -171,8 +167,10 @@ input[type="file"] { display: none; }
 }
 table {
   border-collapse: collapse;
-  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
-  font-size: 13px; width: 100%;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 13px;
+  table-layout: fixed;
+  width: 100%;
 }
 
 /* row-number column */
@@ -192,7 +190,7 @@ th {
   background: #e8e8e8; border: 1px solid #d0d0d0;
   font-size: 12px; font-weight: 700; text-align: center;
   padding: 3px 8px; cursor: pointer; user-select: none;
-  min-width: 90px; white-space: nowrap;
+  white-space: nowrap;
   color: #1f1f1f; transition: background .1s;
 }
 th:hover:not(.xl-row-num) { background: #d8d8d8; }
@@ -204,9 +202,9 @@ th.col-selected {
 td {
   border: 1px solid #d0d0d0; padding: 2px 8px;
   background: #fff; color: #000;
-  cursor: pointer; min-width: 90px; height: 20px;
+  cursor: pointer; height: 20px;
   font-size: 13px; white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis; max-width: 240px;
+  text-overflow: ellipsis;
 }
 tr:hover td:not(.xl-row-num) { background: #e8f0fd; }
 tr:nth-child(even) td:not(.xl-row-num) { background: #f9f9f9; }
@@ -222,7 +220,7 @@ th.col-selected ~ th, td.cell-selected { background-color: #ebf7ed; }
   width: 100%; padding: 2px 5px; border: 2px solid #70ad47;
   border-radius: 1px; font-size: 12px; font-weight: 700;
   color: #276221; background: #e2efda;
-  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   outline: none; min-width: 80px;
 }
 .rename-input:focus { border-color: #217346; }
@@ -335,7 +333,7 @@ th.col-selected ~ th, td.cell-selected { background-color: #ebf7ed; }
 /* ===== STANDARD BUTTONS ===== */
 .btn {
   padding: 5px 14px; border-radius: 2px;
-  font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 13px; font-weight: 400; cursor: pointer;
   border: 1px solid #d0d0d0; background: #f3f3f3; color: #1f1f1f;
   transition: background .1s; white-space: nowrap; line-height: 1.4;
@@ -370,18 +368,12 @@ body.study-mode [data-tip] { cursor: help !important; }
 </head>
 <body>
 
-<!-- ===== NAV ===== -->
-<header class="global-nav">
-  <div class="global-nav__inner">
-    <a class="global-nav__brand" href="https://erofly83-arch.github.io/pricematcher/">Навигатор</a>
-    <nav class="global-nav__links" aria-label="Навигация">
-      <a class="global-nav__link" href="https://erofly83-arch.github.io/synonyms/" data-match="/synonyms/">Редактор JSON</a>
-      <a class="global-nav__link" href="https://erofly83-arch.github.io/pricematcher/" data-match="/pricematcher/">Мониторинг</a>
-      <a class="global-nav__link is-active" href="https://erofly83-arch.github.io/obrezatel/" data-match="/obrezatel/">Обрезатель</a>
-      <a class="global-nav__link" href="https://erofly83-arch.github.io/sininimfinder/" data-match="/sininimfinder/">Поиск синонимов</a>
-    </nav>
-  </div>
-</header>
+<!-- ===== APP NAV ===== -->
+<nav class="app-nav">
+  <a href="https://erofly83-arch.github.io/obrezatel/" class="nav-active">Excel в CSV</a>
+  <a href="https://erofly83-arch.github.io/pricematcher/">Мониторинг</a>
+  <a href="https://erofly83-arch.github.io/poiskovikexcel/">Синонимы</a>
+</nav>
 
 <!-- Tooltip for study mode -->
 <div id="study-tooltip"></div>
@@ -803,6 +795,54 @@ function esc(t) {
   return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
 
+function applyColWidths() {
+  const MAX_W = 150;
+  const PAD   = 18; // horizontal padding per cell (2 * 8px + border)
+  if (!tableData || !tableData.length) return;
+  const maxCols = Math.max(0, ...tableData.map(r => r ? r.length : 0));
+  const rowsToSample = Math.min(tableData.length, 60);
+
+  // Use canvas to measure text widths (fast, no layout thrash)
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = '13px "Segoe UI", Arial, sans-serif';
+  const ctxH = document.createElement('canvas').getContext('2d');
+  ctxH.font = 'bold 12px "Segoe UI", Arial, sans-serif';
+
+  const widths = new Array(maxCols).fill(0);
+  // measure header: column numbers or rename inputs (just use col index label)
+  for (let i = 0; i < maxCols; i++) {
+    widths[i] = Math.max(widths[i], ctxH.measureText(String(i + 1)).width + PAD + 24);
+  }
+  // measure cell content
+  for (let ri = 0; ri < rowsToSample; ri++) {
+    const row = tableData[ri] || [];
+    for (let ci = 0; ci < maxCols; ci++) {
+      const v = row[ci] != null ? String(row[ci]) : '';
+      const w = ctx.measureText(v).width + PAD;
+      if (w > widths[ci]) widths[ci] = w;
+    }
+  }
+
+  // build colgroup
+  const table = dataTable.closest('table');
+  if (!table) return;
+  let old = table.querySelector('colgroup');
+  if (old) old.remove();
+  const cg = document.createElement('colgroup');
+  // first col: row-number
+  const cNum = document.createElement('col');
+  cNum.style.width = '36px';
+  cg.appendChild(cNum);
+  for (let i = 0; i < maxCols; i++) {
+    const c = document.createElement('col');
+    const w = Math.min(Math.ceil(widths[i]), MAX_W);
+    c.style.width = w + 'px';
+    cg.appendChild(c);
+  }
+  table.insertBefore(cg, table.firstChild);
+}
+
 function renderTable() {
   if (!tableData || !tableData.length) { dataTable.innerHTML = "<tr><td>Нет данных</td></tr>"; updateStats(); return; }
   const maxCols = Math.max(0, ...tableData.map(r => r ? r.length : 0));
@@ -833,6 +873,7 @@ function renderTable() {
   }
   html += "</tbody>";
   dataTable.innerHTML = html;
+  applyColWidths();
   attachEvents();
   updateStats();
 }
@@ -1211,14 +1252,4 @@ saveAppBtn.addEventListener("click", async () => {
 });
 </script>
 
-<script>
-(function(){
-  const href = location.href;
-  document.querySelectorAll('.global-nav__link').forEach(a => {
-    const m = a.getAttribute('data-match') || '';
-    if (m && href.includes(m)) a.classList.add('is-active');
-    if (!m && href.startsWith(a.href)) a.classList.add('is-active');
-  });
-})();
-</script>
 </body></html>
