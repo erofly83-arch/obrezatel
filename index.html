@@ -146,6 +146,84 @@ input[type="file"] { display: none; }
 }
 .xl-hint b { color: #1f1f1f; }
 
+/* ===== COMPLEX MODE ===== */
+.complex-banner {
+  display: none; background: #fff8e1; border-bottom: 2px solid #f59e0b;
+  padding: 8px 16px; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 13px; color: #7c4f00;
+}
+.complex-banner.visible { display: flex; }
+.complex-banner b { color: #92400e; }
+.complex-banner-btn {
+  background: #f59e0b; color: #fff; border: none; border-radius: 3px;
+  padding: 5px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: 'Segoe UI', Arial, sans-serif; transition: background .12s;
+}
+.complex-banner-btn:hover { background: #d97706; }
+.complex-banner-btn.active { background: #059669; }
+.complex-dismiss { margin-left:auto; cursor:pointer; color:#b45309; font-size:18px; line-height:1; background:none; border:none; padding:0 4px; }
+.complex-modal-box { max-width:720px; width:100%; max-height:85vh; display:flex; flex-direction:column; }
+.complex-modal-box .modal-body { overflow-y:auto; flex:1; padding-bottom:8px; }
+.subheader-list { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+
+/* group card */
+.subheader-group {
+  border:1px solid #e0e0e0; border-radius:5px;
+  background:#fafafa; overflow:hidden;
+}
+.subheader-group-head {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 12px; cursor:pointer; user-select:none;
+  border-bottom:1px solid transparent; transition:background .1s;
+}
+.subheader-group-head:hover { background:#f3f3f3; }
+.subheader-group.is-skipped .subheader-group-head { background:#f5f5f5; opacity:.6; }
+.subheader-group.is-skipped .subheader-group-body { display:none; }
+.subheader-group-head-title { font-size:13px; font-weight:700; color:#222; flex:1; }
+.subheader-group-head-badge {
+  font-size:11px; border-radius:3px; padding:2px 7px; font-weight:600; white-space:nowrap;
+}
+.badge-skip { background:#f1f1f1; color:#888; border:1px solid #ddd; }
+.badge-ok   { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; }
+.subheader-group-body { padding:10px 12px; border-top:1px solid #eee; }
+
+/* samples block */
+.sg-samples { margin-bottom:10px; }
+.sg-sample {
+  font-size:13px; color:#444; padding:3px 0; border-bottom:1px dashed #eee;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sg-sample:last-child { border-bottom:none; }
+
+/* token chips */
+.token-chips { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:8px; }
+.token-chip {
+  padding:5px 12px; border-radius:20px; border:1.5px solid #cbd5e1;
+  background:#fff; font-size:13px; cursor:pointer; user-select:none;
+  color:#334155; transition:all .12s; font-weight:500;
+}
+.token-chip:hover { border-color:#94a3b8; background:#f1f5f9; }
+.token-chip.selected { background:#059669; color:#fff; border-color:#047857; }
+
+/* preview */
+.sg-preview-list { margin-top:6px; }
+.sg-preview-item {
+  font-size:13px; padding:3px 6px; border-radius:3px; margin-bottom:3px;
+  border-bottom:1px dashed #e0e0e0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sg-preview-item.preview-added { color:#059669; font-weight:600; }
+.sg-preview-item.preview-skip  { color:#888; font-style:italic; }
+.sg-preview-item.preview-none  { color:#aaa; }
+.sg-skip-btn {
+  display:inline-block; font-size:12px; color:#94a3b8; cursor:pointer;
+  text-decoration:underline; padding:0; border:none; background:none;
+  font-family:'Segoe UI',Arial,sans-serif;
+}
+.sg-skip-btn:hover { color:#64748b; }
+
+.complex-summary { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:4px; padding:8px 12px; font-size:13px; color:#166534; margin-bottom:10px; }
+.complex-note { background:#fef9c3; border:1px solid #fde68a; border-radius:4px; padding:7px 11px; font-size:12px; color:#78350f; margin-bottom:10px; line-height:1.5; }
+
 /* ===== QUEUE CHIP ===== */
 .xl-queue {
   background: #e8f4ef; border: 1px solid #8fcfb0; border-radius: 3px;
@@ -169,8 +247,9 @@ table {
   border-collapse: collapse;
   font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 13px;
-  table-layout: fixed;
-  width: 100%;
+  table-layout: auto;
+  width: max-content;
+  min-width: 100%;
 }
 
 /* row-number column */
@@ -451,6 +530,16 @@ body.study-mode [data-tip] { cursor: help !important; }
 
     <div class="xl-toolbar-sep"></div>
 
+    <!-- Группа: сложный прайс -->
+    <div class="xl-group" id="complexBtnGroup" style="display:none;">
+      <button class="xl-btn" id="complexConfigBtn"
+        data-tip="Открыть редактор подзаголовков: выбрать, какую часть строки-заголовка добавлять к наименованию товара.">
+        <span class="xl-icon">🔍</span>
+        <span>Подзаголовки</span>
+      </button>
+    </div>
+    <div class="xl-toolbar-sep" id="complexSep" style="display:none;"></div>
+
     <!-- Группа: справка -->
     <div class="xl-group">
       <button class="xl-btn" id="studyModeBtn"
@@ -494,6 +583,13 @@ body.study-mode [data-tip] { cursor: help !important; }
     <b>Как работать:</b>
     кликните по заголовку столбца — выберите название из списка или введите своё.
     После выбора нужных столбцов нажмите «Скачать CSV».
+  </div>
+
+  <!-- Complex mode banner -->
+  <div class="complex-banner" id="complexBanner">
+    <span>🔶 <b>Сложный прайслист</b> — обнаружены строки-подзаголовки с категориями/брендами.</span>
+    <button class="complex-banner-btn" id="complexEnableBtn">Включить режим подзаголовков</button>
+    <button class="complex-dismiss" id="complexDismiss" title="Скрыть">✕</button>
   </div>
 
   <!-- Table -->
@@ -563,6 +659,33 @@ body.study-mode [data-tip] { cursor: help !important; }
   </div>
 </div>
 
+<!-- ===== MODAL: Подзаголовки сложного прайса ===== -->
+<div class="modal" id="complexModal">
+  <div class="modal-box complex-modal-box">
+    <div class="modal-titlebar">
+      <span>🔍 Настройка подзаголовков</span>
+      <button class="btn btn-small" id="closeComplexModal" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">✕ Закрыть</button>
+    </div>
+    <div class="modal-body">
+      <div class="complex-note">
+        <b>Как работает:</b> ниже перечислены все строки-подзаголовки, найденные в прайсе (строки с категориями, группами, брендами).
+        Кликните по нужному токену (часть текста между <b>\</b>), чтобы добавлять его перед наименованием товара.
+        Можно выбрать <b>несколько токенов</b> — они объединятся через пробел.
+        Если бренд уже есть в наименовании — он <b>не будет добавлен повторно</b>.
+      </div>
+      <div id="complexSummaryDiv" class="complex-summary" style="display:none;"></div>
+      <div id="complexSubheaderList" class="subheader-list"></div>
+      <p id="complexNoData" style="display:none;color:#888;font-size:13px;">
+        Подзаголовков не найдено. Убедитесь, что выбраны колонки «Штрихкод» и «Наименование», и задана начальная строка.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="complexResetBtn">↩ Сбросить всё</button>
+      <button class="btn btn-green" id="complexApplyBtn">✓ Применить</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ===== CONFIG =====
 function getUserConfig() {
@@ -623,6 +746,13 @@ let pendingSkippedRows = [];
 let lastSaveHandle = null;
 let studyMode = false;
 
+// ===== COMPLEX MODE STATE =====
+let complexModeEnabled = false;
+let complexDetected = false;
+let currentWs = null; // current worksheet (for merge detection)
+// subheaderGroups: [{key, rows:[rowIndex], rawText, tokens, selectedTokens:[]}]
+let subheaderGroups = [];
+
 // ===== DOM =====
 const uploadScreen   = document.getElementById("uploadScreen");
 const fileInput      = document.getElementById("fileInput");
@@ -650,6 +780,19 @@ const skippedTable   = document.getElementById("skippedTable");
 const confirmDownloadCsvBtn = document.getElementById("confirmDownloadCsvBtn");
 const downloadSkippedBtn = document.getElementById("downloadSkippedBtn");
 const studyModeBtn   = document.getElementById("studyModeBtn");
+const complexBanner    = document.getElementById("complexBanner");
+const complexEnableBtn = document.getElementById("complexEnableBtn");
+const complexDismiss   = document.getElementById("complexDismiss");
+const complexBtnGroup  = document.getElementById("complexBtnGroup");
+const complexSep       = document.getElementById("complexSep");
+const complexConfigBtn = document.getElementById("complexConfigBtn");
+const complexModal     = document.getElementById("complexModal");
+const closeComplexModal= document.getElementById("closeComplexModal");
+const complexSubheaderList = document.getElementById("complexSubheaderList");
+const complexNoData    = document.getElementById("complexNoData");
+const complexSummaryDiv= document.getElementById("complexSummaryDiv");
+const complexApplyBtn  = document.getElementById("complexApplyBtn");
+const complexResetBtn  = document.getElementById("complexResetBtn");
 
 // ===== STUDY MODE =====
 studyModeBtn.addEventListener("click", function() {
@@ -785,9 +928,20 @@ function autoDetectColumns() {
 function loadSheet(idx) {
   if (!currentWorkbook) return;
   const ws = currentWorkbook.Sheets[currentWorkbook.SheetNames[idx]];
+  currentWs = ws;
   tableData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "", raw: true });
   startRowIndex = 0; selectedColumns.clear(); displayedRows = Math.min(50, tableData.length);
   autoDetectColumns(); renderTable(); updateLoadMore();
+
+  // Complex mode detection
+  complexDetected = detectComplexPricelist(ws);
+  subheaderGroups = []; // reset on new sheet
+  if (!complexDetected) {
+    showComplexBanner(false);
+    setComplexMode(false);
+  } else {
+    showComplexBanner(true);
+  }
 }
 
 // ===== RENDER =====
@@ -824,7 +978,7 @@ function applyColWidths() {
     }
   }
 
-  // build colgroup
+  // build colgroup with min-widths (table-layout: auto will grow beyond these if needed)
   const table = dataTable.closest('table');
   if (!table) return;
   let old = table.querySelector('colgroup');
@@ -832,12 +986,13 @@ function applyColWidths() {
   const cg = document.createElement('colgroup');
   // first col: row-number
   const cNum = document.createElement('col');
+  cNum.style.minWidth = '36px';
   cNum.style.width = '36px';
   cg.appendChild(cNum);
   for (let i = 0; i < maxCols; i++) {
     const c = document.createElement('col');
     const w = Math.min(Math.ceil(widths[i]), MAX_W);
-    c.style.width = w + 'px';
+    c.style.minWidth = w + 'px';
     cg.appendChild(c);
   }
   table.insertBefore(cg, table.firstChild);
@@ -985,11 +1140,28 @@ function buildCsvAndSkipped() {
   const bcCol = findBarcodeCol(indices);
   if (bcCol === -1) return { ok: false, error: "Не найдена колонка штрихкода (название должно содержать «штрихкод» / barcode / ean)." };
 
+  // Find name column for complex mode prefix injection
+  let nameCol = -1;
+  if (complexModeEnabled) {
+    for (const ci of indices) {
+      const n = normHeader(selectedColumns.get(ci) || '');
+      if (/наименован/.test(n) || /номенклатур/.test(n)) { nameCol = ci; break; }
+    }
+  }
+  const prefixMap = complexModeEnabled ? buildPrefixMap() : null;
+
   let csv = "\uFEFF" + indices.map(i => esc_csv(selectedColumns.get(i)||"")).join(",") + "\n";
   const skipped = [];
 
   for (let ri = startRowIndex; ri < tableData.length; ri++) {
     const row = tableData[ri] || [];
+
+    // Skip subheader rows in complex mode
+    if (prefixMap !== null) {
+      const { bcCol: bc2 } = findSpecialCols();
+      if (isSubheaderRow(row, bc2)) continue;
+    }
+
     const rawBC = row[bcCol];
     const rawBCS = rawBC == null ? "" : String(rawBC);
     const normBC = normalizeBarcode(rawBC);
@@ -1001,6 +1173,13 @@ function buildCsvAndSkipped() {
       if (ci === bcCol) return normBC;
       let v = row[ci] != null ? String(row[ci]).trim() : "";
       if (/^\d+,\d{2}$/.test(v)) v = v.replace(",", ".");
+      // Apply prefix to name column in complex mode
+      if (prefixMap && ci === nameCol && v) {
+        const prefix = prefixMap.get(ri) || '';
+        if (prefix && !prefixContainedInName(v, prefix)) {
+          v = prefix + ' ' + v;
+        }
+      }
       return v;
     });
     if (vals.every(v => !v)) continue;
@@ -1167,6 +1346,443 @@ addTemplateBtn.addEventListener("click", () => {
   newTemplateInput.value = ""; newTemplateInput.focus();
 });
 newTemplateInput.addEventListener("keydown", e => { if (e.key === "Enter") addTemplateBtn.click(); });
+
+// ===== COMPLEX MODE LOGIC =====
+
+function detectComplexPricelist(ws) {
+  // Primary: merged cells are the clearest signal
+  const merges = ws['!merges'] || [];
+  if (merges.length >= 3) return true;
+  // Secondary: rows with backslash separator (category\brand format)
+  if (tableData) {
+    let slashRows = 0;
+    const sample = Math.min(tableData.length, 150);
+    for (let ri = 0; ri < sample; ri++) {
+      const row = tableData[ri] || [];
+      const rowText = row.map(c => String(c || '').trim()).join(' ');
+      if (/\\/.test(rowText)) { slashRows++; if (slashRows >= 2) return true; }
+    }
+  }
+  return false;
+}
+
+function showComplexBanner(show) {
+  complexBanner.classList.toggle('visible', show);
+}
+
+function setComplexMode(enabled) {
+  complexModeEnabled = enabled;
+  if (enabled) {
+    complexEnableBtn.textContent = '✓ Режим активен — настроить';
+    complexEnableBtn.classList.add('active');
+    // Immediately open modal so user sees what was found
+    renderComplexModal();
+    complexModal.style.display = 'flex';
+  } else {
+    complexEnableBtn.textContent = 'Включить режим подзаголовков';
+    complexEnableBtn.classList.remove('active');
+    subheaderGroups = [];
+  }
+}
+
+// Find barcode and name column indices from selectedColumns
+function findSpecialCols() {
+  let bcCol = -1, nameCol = -1;
+  selectedColumns.forEach((label, ci) => {
+    const n = normHeader(label || '');
+    if (bcCol < 0 && (/штрихкод/.test(n) || /barcode/.test(n) || /\bean\b/.test(n))) bcCol = ci;
+    if (nameCol < 0 && (/наименован/.test(n) || /номенклатур/.test(n))) nameCol = ci;
+  });
+  return { bcCol, nameCol };
+}
+
+// Detect the first "data" row index (after title and column header rows)
+function findDataStartRow() {
+  if (!tableData) return 0;
+  const maxCols = Math.max(0, ...tableData.map(r => r ? r.length : 0));
+  // Find row where most columns were auto-detected (header row)
+  // Heuristic: first row that has ≥ 3 non-empty cells and doesn't have a backslash
+  for (let ri = 0; ri < Math.min(tableData.length, 20); ri++) {
+    const row = tableData[ri] || [];
+    const nonEmpty = row.filter(c => c != null && String(c).trim() !== '');
+    const rowText = nonEmpty.map(c => String(c).trim()).join(' ');
+    if (nonEmpty.length >= 3 && !/\\/.test(rowText)) {
+      return ri + 1; // data starts after this header row
+    }
+  }
+  return 0;
+}
+
+function isSubheaderRow(row, bcCol) {
+  // Fast path: if barcode column has a valid barcode → definitely product row
+  if (bcCol >= 0) {
+    const bc = normalizeBarcode(row[bcCol]);
+    if (bc && /^\d{6,}$/.test(bc)) return false;
+  }
+  // Count non-empty cells
+  const nonEmpty = row.filter(c => c != null && String(c).trim() !== '');
+  if (nonEmpty.length === 0) return false;
+
+  // If only 1-2 cells filled → strong subheader signal
+  if (nonEmpty.length <= 2) {
+    const text = String(nonEmpty[0]).trim();
+    // Exclude pure numbers (totals, page numbers etc.)
+    if (/^[\d\s.,]+$/.test(text)) return false;
+    // Exclude very short texts (single letter)
+    if (text.length < 2) return false;
+    return true;
+  }
+  return false;
+}
+
+function parseTokens(rawText) {
+  // Split by single backslash (the separator in this supplier's format)
+  // Also handle forward slash and multiple backslashes
+  const titleCase = s => s.length === 0 ? s : s[0].toUpperCase() + s.slice(1).toLowerCase();
+  const seen = new Set();
+  return rawText.split(/[\\\/]+/)
+    .map(t => t.replace(/^[\s"«»'\u00ab\u00bb]+|[\s"«»'\u00ab\u00bb]+$/g, ''))
+    .filter(t => t.length > 1)
+    .map(t => titleCase(t))
+    .filter(t => { const key = t.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
+}
+
+// Get sample product names for a subheader group
+function getSampleProducts(subheaderRow, nameCol, count) {
+  if (nameCol < 0 || !tableData) return [];
+  const { bcCol } = findSpecialCols();
+  const samples = [];
+  for (let ri = subheaderRow + 1; ri < tableData.length && samples.length < count; ri++) {
+    const row = tableData[ri] || [];
+    // Stop at next subheader
+    if (isSubheaderRow(row, bcCol)) break;
+    const name = String(row[nameCol] || '').trim();
+    if (name) samples.push(name);
+  }
+  return samples;
+}
+
+function autoSelectTokens(group) {
+  // Auto-select tokens that are NOT already present in sample product names.
+  // The first token is typically a broad product group name (e.g. "Бытовая техника")
+  // and should never be auto-selected — the user picks it manually if needed.
+  if (!group.tokens.length) return;
+  const samples = group.samples;
+
+  // Candidates: all tokens except the first one
+  const candidates = group.tokens.slice(1);
+  if (!candidates.length) {
+    // Only one token total — leave empty, let user decide
+    group.selectedTokens = [];
+    return;
+  }
+
+  if (!samples.length) {
+    // No samples to analyse — pick last token as specific guess (skip first)
+    group.selectedTokens = [candidates[candidates.length - 1]];
+    return;
+  }
+
+  const missing = candidates.filter(tok => {
+    const t = tok.toLowerCase().replace(/\s+/g, ' ');
+    return !samples.some(name => name.toLowerCase().includes(t));
+  });
+  // Use missing tokens from candidates; if all already present — select nothing
+  group.selectedTokens = missing.length > 0 ? missing : [];
+}
+
+function buildSubheaderGroups() {
+  if (!tableData) return [];
+  const { bcCol, nameCol } = findSpecialCols();
+  const dataStart = findDataStartRow();
+  const groups = new Map();
+
+  for (let ri = Math.max(startRowIndex, dataStart); ri < tableData.length; ri++) {
+    const row = tableData[ri] || [];
+    if (!isSubheaderRow(row, bcCol)) continue;
+
+    // Get text: join all non-empty cells
+    const cells = row.filter(c => c != null && String(c).trim() !== '');
+    const rawText = cells.map(c => String(c).trim()).join(' \\ ');
+    const key = rawText.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (!key) continue;
+
+    if (!groups.has(key)) {
+      const tokens = parseTokens(rawText);
+      // Restore previously saved selection AND skipped state
+      const prev = subheaderGroups.find(g => g.key === key) || {};
+      const samples = getSampleProducts(ri, nameCol, 5);
+      const newGroup = {
+        key, rows: [], rawText, tokens,
+        selectedTokens: (prev.selectedTokens || []).slice(),
+        skipped: prev.skipped || false,
+        samples
+      };
+      // Auto-select tokens only if there's no prior user selection
+      if (!prev.selectedTokens) autoSelectTokens(newGroup);
+      groups.set(key, newGroup);
+    }
+    groups.get(key).rows.push(ri);
+  }
+
+  return Array.from(groups.values());
+}
+
+function renderComplexModal() {
+  subheaderGroups = buildSubheaderGroups();
+  complexSubheaderList.innerHTML = '';
+
+  if (subheaderGroups.length === 0) {
+    complexNoData.style.display = '';
+    complexSummaryDiv.style.display = 'none';
+    return;
+  }
+  complexNoData.style.display = 'none';
+
+  const updateSummary = () => {
+    const cfg = subheaderGroups.filter(g => g.selectedTokens.length > 0).length;
+    const skipped = subheaderGroups.filter(g => g.skipped).length;
+    complexSummaryDiv.style.display = '';
+    complexSummaryDiv.textContent =
+      `Найдено групп: ${subheaderGroups.length}. ` +
+      `Настроено (добавят префикс): ${cfg}. ` +
+      (skipped ? `Скрыто: ${skipped}.` : '');
+  };
+  updateSummary();
+
+  // ---- Quick-action bar ----
+  let quickBar = complexSubheaderList.previousElementSibling;
+  if (!quickBar || !quickBar.classList.contains('complex-quick-bar')) {
+    quickBar = document.createElement('div');
+    quickBar.className = 'complex-quick-bar';
+    quickBar.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;';
+    complexSubheaderList.parentNode.insertBefore(quickBar, complexSubheaderList);
+  }
+  quickBar.innerHTML = '';
+
+  const makeQBtn = (label, title, fn) => {
+    const b = document.createElement('button');
+    b.className = 'btn btn-small'; b.textContent = label; b.title = title;
+    b.addEventListener('click', () => { fn(); renderComplexModal(); });
+    return b;
+  };
+
+  quickBar.appendChild(makeQBtn('🤖 Авто-выбор', 'Автоматически выбрать токены по наличию/отсутствию в наименованиях товаров', () => {
+    subheaderGroups.forEach(g => { g.skipped = false; autoSelectTokens(g); });
+  }));
+  quickBar.appendChild(makeQBtn('☑ Выбрать все первые', 'Выбрать первый токен каждой группы', () => {
+    subheaderGroups.forEach(g => { g.skipped = false; if (g.tokens.length) g.selectedTokens = [g.tokens[0]]; });
+  }));
+  quickBar.appendChild(makeQBtn('☑ Выбрать все токены', 'Выбрать все токены каждой группы', () => {
+    subheaderGroups.forEach(g => { g.skipped = false; g.selectedTokens = g.tokens.slice(); });
+  }));
+  quickBar.appendChild(makeQBtn('✕ Снять всё', 'Сбросить выбор во всех группах', () => {
+    subheaderGroups.forEach(g => { g.selectedTokens = []; g.skipped = false; });
+  }));
+
+  subheaderGroups.forEach((group) => {
+    // ---- card wrapper ----
+    const card = document.createElement('div');
+    card.className = 'subheader-group' + (group.skipped ? ' is-skipped' : '');
+
+    // ---- header row (always visible, click to toggle body) ----
+    const head = document.createElement('div');
+    head.className = 'subheader-group-head';
+
+    const headTitle = document.createElement('span');
+    headTitle.className = 'subheader-group-head-title';
+    headTitle.textContent = group.rawText;
+    head.appendChild(headTitle);
+
+    const badge = document.createElement('span');
+    badge.className = 'subheader-group-head-badge ' + (group.selectedTokens.length > 0 ? 'badge-ok' : 'badge-skip');
+    badge.textContent = group.skipped
+      ? '⊘ скрыта'
+      : group.selectedTokens.length > 0
+        ? '+ ' + group.selectedTokens.join(' ')
+        : '— без префикса';
+    head.appendChild(badge);
+
+    // toggle body on header click
+    head.addEventListener('click', () => {
+      if (group.skipped) {
+        group.skipped = false;
+        card.classList.remove('is-skipped');
+        badge.className = 'subheader-group-head-badge badge-skip';
+        badge.textContent = '— без префикса';
+        updateSummary();
+      }
+    });
+    card.appendChild(head);
+
+    // ---- body ----
+    const body = document.createElement('div');
+    body.className = 'subheader-group-body';
+
+    // Samples (product names)
+    if (group.samples.length > 0) {
+      const samplesDiv = document.createElement('div');
+      samplesDiv.className = 'sg-samples';
+      group.samples.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'sg-sample';
+        row.textContent = s;
+        samplesDiv.appendChild(row);
+      });
+      body.appendChild(samplesDiv);
+    }
+
+    // Instruction
+    const instr = document.createElement('div');
+    instr.style.cssText = 'font-size:12px;color:#888;margin-bottom:6px;';
+    instr.textContent = 'Выберите токены для добавления в начало наименования:';
+    body.appendChild(instr);
+
+    // Token chips
+    const chipsRow = document.createElement('div');
+    chipsRow.className = 'token-chips';
+
+    const refreshPreview = () => {
+      previewList.innerHTML = '';
+      const prefix = group.selectedTokens.join(' ');
+      group.samples.forEach(name => {
+        const item = document.createElement('div');
+        item.className = 'sg-preview-item';
+        if (prefix === '') {
+          item.className += ' preview-none';
+          item.textContent = name.length > 80 ? name.slice(0,78)+'…' : name;
+        } else if (prefixContainedInName(name, prefix)) {
+          item.className += ' preview-skip';
+          item.textContent = '⚠ уже есть: ' + (name.length > 75 ? name.slice(0,73)+'…' : name);
+        } else {
+          item.className += ' preview-added';
+          const full = prefix + ' ' + name;
+          item.textContent = '→ ' + (full.length > 80 ? full.slice(0,78)+'…' : full);
+        }
+        previewList.appendChild(item);
+      });
+      // update badge
+      badge.className = 'subheader-group-head-badge ' + (group.selectedTokens.length > 0 ? 'badge-ok' : 'badge-skip');
+      badge.textContent = group.skipped
+        ? '⊘ скрыта'
+        : group.selectedTokens.length > 0
+          ? '+ ' + group.selectedTokens.join(' ')
+          : '— без префикса';
+      updateSummary();
+    };
+
+    group.tokens.forEach(token => {
+      const chip = document.createElement('span');
+      chip.className = 'token-chip' + (group.selectedTokens.includes(token) ? ' selected' : '');
+      chip.textContent = token;
+      chip.addEventListener('click', () => {
+        const idx = group.selectedTokens.indexOf(token);
+        if (idx >= 0) group.selectedTokens.splice(idx, 1);
+        else group.selectedTokens.push(token);
+        chip.classList.toggle('selected', group.selectedTokens.includes(token));
+        refreshPreview();
+      });
+      chipsRow.appendChild(chip);
+    });
+    body.appendChild(chipsRow);
+
+    // Skip button
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'sg-skip-btn';
+    skipBtn.textContent = '⊘ скрыть группу (не добавлять префикс)';
+    skipBtn.addEventListener('click', () => {
+      group.skipped = true;
+      group.selectedTokens = [];
+      card.classList.add('is-skipped');
+      badge.className = 'subheader-group-head-badge badge-skip';
+      badge.textContent = '⊘ скрыта';
+      updateSummary();
+    });
+    body.appendChild(skipBtn);
+
+    // Preview list
+    const previewLabel = document.createElement('div');
+    previewLabel.style.cssText = 'font-size:11px;color:#888;margin-top:10px;margin-bottom:3px;';
+    previewLabel.textContent = 'Предпросмотр наименований:';
+    body.appendChild(previewLabel);
+
+    const previewList = document.createElement('div');
+    previewList.className = 'sg-preview-list';
+    body.appendChild(previewList);
+    refreshPreview();
+
+    card.appendChild(body);
+    complexSubheaderList.appendChild(card);
+  });
+}
+
+// Build rowIndex → prefix map for CSV export
+// FIXED: iterate ALL rows linearly, tracking current prefix.
+// Reset prefix at ANY subheader row (even those with no selected tokens).
+function buildPrefixMap() {
+  if (!complexModeEnabled || subheaderGroups.length === 0) return null;
+  const { bcCol } = findSpecialCols();
+
+  // Build lookup: subheaderGroupsByKey for O(1) access
+  const groupByKey = new Map();
+  subheaderGroups.forEach(g => groupByKey.set(g.key, g));
+
+  const dataStart = findDataStartRow();
+  const prefixMap = new Map();
+  let currentPrefix = '';
+
+  for (let ri = Math.max(startRowIndex, dataStart); ri < tableData.length; ri++) {
+    const row = tableData[ri] || [];
+
+    if (isSubheaderRow(row, bcCol)) {
+      // Find which group this row belongs to
+      const cells = row.filter(c => c != null && String(c).trim() !== '');
+      const rawText = cells.map(c => String(c).trim()).join(' \\ ');
+      const key = rawText.toLowerCase().replace(/\s+/g, ' ').trim();
+      const group = groupByKey.get(key);
+      // Always reset prefix (even if group has no tokens — stops prev group leaking)
+      currentPrefix = (group && !group.skipped && group.selectedTokens.length > 0)
+        ? group.selectedTokens.join(' ')
+        : '';
+      continue;
+    }
+
+    if (currentPrefix) prefixMap.set(ri, currentPrefix);
+  }
+
+  return prefixMap.size > 0 ? prefixMap : null;
+}
+
+function prefixContainedInName(name, prefix) {
+  const nameLow = name.toLowerCase();
+  return prefix.toLowerCase().split(/\s+/).every(tok => tok.length > 1 && nameLow.includes(tok));
+}
+
+// ===== COMPLEX MODE EVENTS =====
+complexEnableBtn.addEventListener('click', () => {
+  setComplexMode(!complexModeEnabled);
+});
+complexDismiss.addEventListener('click', () => {
+  showComplexBanner(false);
+});
+// "Подзаголовки" button in toolbar (still kept for re-opening)
+complexConfigBtn.addEventListener('click', () => {
+  renderComplexModal();
+  complexModal.style.display = 'flex';
+});
+closeComplexModal.addEventListener('click', () => { complexModal.style.display = 'none'; });
+complexModal.addEventListener('click', e => { if (e.target === complexModal) complexModal.style.display = 'none'; });
+complexApplyBtn.addEventListener('click', () => {
+  complexModal.style.display = 'none';
+  const configured = subheaderGroups.filter(g => g.selectedTokens.length > 0).length;
+  complexEnableBtn.textContent = configured > 0
+    ? `✓ Режим активен (${configured} групп) — изменить`
+    : '✓ Режим активен — настроить';
+});
+complexResetBtn.addEventListener('click', () => {
+  subheaderGroups.forEach(g => { g.selectedTokens = []; g.skipped = false; autoSelectTokens(g); });
+  renderComplexModal();
+});
 
 // ===== JS TOOLTIP ENGINE =====
 (function() {
